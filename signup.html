@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#4a148c">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up Form</title>
+  <link rel="stylesheet" href="./login.css" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="login">
+    <img src="images/news-image3.jpg" alt="signup image" class="login__img" />
+
+    <form id="signup-form" class="login__form">
+      <h1 class="login__title">Sign Up</h1>
+
+      <div class="login__content">
+
+        <!-- First Name -->
+        <div class="login__box">
+          <i class="ri-user-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="text" id="first-name" required class="login__input" placeholder="">
+            <label class="login__label">First Name</label>
+          </div>
+        </div>
+
+        <!-- Last Name -->
+        <div class="login__box">
+          <i class="ri-user-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="text" id="last-name" required class="login__input" placeholder="">
+            <label class="login__label">Last Name</label>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="login__box">
+          <i class="ri-mail-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="email" id="email" required class="login__input" placeholder="">
+            <label class="login__label">Email (optional)</label>
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="login__box">
+          <i class="ri-user-line login__icon"></i>
+          <div class="login__box-input">
+            <select id="gender" class="login__input" required>
+              <option value="" disabled selected hidden>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Mobile Number -->
+        <div class="login__box">
+          <i class="ri-phone-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="tel" id="mobile" required class="login__input" placeholder="" pattern="[0-9]{10}">
+            <label class="login__label">Mobile Number</label>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="login__box">
+          <i class="ri-lock-2-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="password" required class="login__input" id="signup-pass" placeholder="">
+            <label class="login__label">Password</label>
+            <i class="ri-eye-off-line login__eye" id="signup-eye"></i>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="login__box">
+          <i class="ri-lock-password-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="password" required class="login__input" id="confirm-pass" placeholder="">
+            <label class="login__label">Confirm Password</label>
+            <i class="ri-eye-off-line login__eye" id="confirm-eye"></i>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="login__button">Sign Up</button>
+
+      <p class="login__register">
+        Already have an account? <a href="login.html">Login</a>
+      </p>
+    </form>
+  </div>
+
+  <!-- Toggle Password Visibility -->
+  <script>
+    const showHiddenPass = (passId, eyeId) => {
+      const input = document.getElementById(passId),
+            iconEye = document.getElementById(eyeId);
+
+      iconEye.addEventListener('click', () => {
+        if (input.type === 'password') {
+          input.type = 'text';
+          iconEye.classList.add('ri-eye-line');
+          iconEye.classList.remove('ri-eye-off-line');
+        } else {
+          input.type = 'password';
+          iconEye.classList.remove('ri-eye-line');
+          iconEye.classList.add('ri-eye-off-line');
+        }
+      });
+    };
+
+    showHiddenPass('signup-pass', 'signup-eye');
+    showHiddenPass('confirm-pass', 'confirm-eye');
+  </script>
+
+  <!-- Submit Form to Backend -->
+  <script>
+    document.getElementById("signup-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById("first-name").value;
+      const lastName = document.getElementById("last-name").value;
+      const email = document.getElementById("email").value;
+      const gender = document.getElementById("gender").value;
+      const mobile = document.getElementById("mobile").value;
+      const password = document.getElementById("signup-pass").value;
+      const confirmPassword = document.getElementById("confirm-pass").value;
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      try {
+        const res = await fetch("https://kanha-backend-yfx1.onrender.com/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firstName, lastName, email, gender, mobile, password, confirmPassword })
+        });
+
+        const result = await res.json();
+        alert(result.message);
+
+        if (res.ok) {
+          window.location.href = "login.html";
+        }
+
+      } catch (error) {
+        console.error("Signup failed:", error);
+        alert("Something went wrong. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>
