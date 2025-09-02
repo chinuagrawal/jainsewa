@@ -264,7 +264,19 @@ http://www.tooplate.com/view/2098-health
     display: flex;
     height: 45px;
   }
+ .logo-title {
+  display: flex;
+  align-items: center;
+  gap: 1px; /* space between logo and text */
+}
 
+.logo {
+  height: 50px;    /* adjust as needed */
+  width: 50px;     /* make it square so circle looks perfect */
+  border-radius: 50%;
+  object-fit: cover; /* ensures image fills the circle nicely */
+  border: 2px solid white; /* optional: adds border */
+}
   header .col-md-8 {
     padding-right: 0;
   }
@@ -960,6 +972,7 @@ http://www.tooplate.com/view/2098-health
     header {
       height: inherit;
     }
+    
     header span.date-icon {
       border: 0;
       padding-right: 0;
@@ -994,47 +1007,136 @@ http://www.tooplate.com/view/2098-health
   }
 
   @media only screen and (max-width: 767px) {
-    .navbar-default .navbar-collapse, .navbar-default .navbar-form {
-      border-color: transparent;
-    }
-    .navbar-default .navbar-nav li.appointment-btn {
-      margin-left: 15px;
-    }
-    .navbar-default .navbar-nav li a {
-      display: inline-block;
-      padding-top: 8px;
-      padding-bottom: 8px;
-    }
-
-    .news-sidebar {
-      margin-top: 2em;
-    }
-
-    #appointment-form {
-      padding-top: 4em;
-      padding-bottom: 4em;
-    }
-
-    footer {
-      padding-top: 60px;
-      padding-bottom: 0;
-    }
-    .footer-thumb {
-      padding-bottom: 10px;
-    }
-
-    .border-top {
-      text-align: center;
-    }
-
-    .copyright-text {
-      margin-top: 10px;
-    }
-
-    .angle-up-btn {
-      bottom: 10em;
-    }
+  /* keep original small-screen tweaks */
+  .navbar-default .navbar-collapse, .navbar-default .navbar-form {
+    border-color: transparent;
   }
+  .navbar-default .navbar-nav li.appointment-btn {
+    margin-left: 15px;
+  }
+  .navbar-default .navbar-nav li a {
+    display: inline-block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .news-sidebar {
+    margin-top: 2em;
+  }
+
+  #appointment-form {
+    padding-top: 4em;
+    padding-bottom: 4em;
+  }
+
+  footer {
+    padding-top: 60px;
+    padding-bottom: 0;
+  }
+  .footer-thumb {
+    padding-bottom: 10px;
+  }
+
+  .border-top {
+    text-align: center;
+  }
+
+  .copyright-text {
+    margin-top: 10px;
+  }
+
+  .angle-up-btn {
+    bottom: 10em;
+  }
+
+  /* -------------------------
+     Off-canvas slide-from-right
+     Works for BS3 (.in) and BS4/5 (.show)
+     ------------------------- */
+
+  /* keep the toggle on top */
+  .navbar-default .navbar-toggle,
+  .navbar-default .navbar-toggler {
+    z-index: 1100;
+  }
+
+  /* off-canvas panel */
+  .navbar-default .navbar-collapse {
+    position: fixed;
+    top: 0;
+    right: 0;                 /* slide in from right */
+    height: 100vh;
+    width: 280px;             /* adjust width if you like */
+    background: #ffffff;
+    transform: translateX(100%);
+    transition: transform .28s ease;
+    box-shadow: -6px 0 20px rgba(0,0,0,.08);
+    padding-top: 70px;        /* space for header / toggle */
+    z-index: 1050;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* open state: Bootstrap 3 adds "in", BS4/5 adds "show" */
+  .navbar-default .navbar-collapse.in,
+  .navbar-default .navbar-collapse.show {
+    transform: translateX(0);
+  }
+
+  /* stack nav links vertically and style */
+  .navbar-default .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    margin: 0;
+    width: 100%;
+  }
+
+  .navbar-default .navbar-nav > li {
+    width: 100%;
+  }
+
+  .navbar-default .navbar-nav > li > a {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f2f2f2;
+    color: #555;
+    font-weight: 500;
+    display: block;
+  }
+
+  /* appointment button in panel */
+  .navbar-default .navbar-nav li.appointment-btn a {
+    margin: 12px 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 4px;
+  }
+
+  /* optional: reduce header content height so toggle isn't overlapped */
+  header {
+    z-index: 1090;
+  }
+
+  /* prevent body scroll when menu is open - toggle class via JS (optional) */
+  body.menu-open {
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* improve close target area (space above menu) */
+  .navbar-default .navbar-collapse::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 280px; /* matches panel width */
+    bottom: 0;
+    z-index: 1040;
+    /* transparent overlay; can be used by JS to close menu when clicked */
+    background: rgba(0,0,0,0);
+  }
+}
+
 
   @media only screen and (max-width: 639px) {
     h1 {
