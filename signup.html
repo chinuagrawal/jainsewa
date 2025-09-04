@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#4a148c">
+  <meta name="theme-color" content="#4a148c">
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -13,10 +13,10 @@
 
 <body>
   <div class="login">
-    <img src="images/news-image3.jpg" alt="signup image" class="login__img" />
+    <img src="images/bg.jpg" alt="signup image" class="login__img" />
 
     <form id="signup-form" class="login__form">
-      <h1 class="login__title">Sign Up</h1>
+      <h1 class="login__title">Registration Form</h1>
 
       <div class="login__content">
 
@@ -38,12 +38,21 @@
           </div>
         </div>
 
-        <!-- Email -->
+        <!-- Email (Optional) -->
         <div class="login__box">
           <i class="ri-mail-line login__icon"></i>
           <div class="login__box-input">
-            <input type="email" id="email" required class="login__input" placeholder="">
+            <input type="email" id="email" class="login__input" placeholder="">
             <label class="login__label">Email (optional)</label>
+          </div>
+        </div>
+
+        <!-- Age -->
+        <div class="login__box">
+          <i class="ri-calendar-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="number" id="age" required class="login__input" placeholder="" min="5" max="120">
+            <label class="login__label">Age</label>
           </div>
         </div>
 
@@ -60,6 +69,31 @@
           </div>
         </div>
 
+        <!-- City -->
+        <div class="login__box">
+          <i class="ri-building-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="text" id="city" required class="login__input" placeholder="">
+            <label class="login__label">City</label>
+          </div>
+        </div>
+
+        <!-- State -->
+        <div class="login__box">
+          <i class="ri-map-pin-line login__icon"></i>
+          <div class="login__box-input">
+            <input type="text" id="state" required class="login__input" placeholder="">
+            <label class="login__label">State</label>
+          </div>
+        </div>
+<!-- Disease -->
+<div class="login__box">
+  <i class="ri-hospital-line login__icon"></i>
+  <div class="login__box-input">
+    <input type="text" id="disease" required class="login__input" placeholder="">
+    <label class="login__label">Disease </label>
+  </div>
+</div>
         <!-- Mobile Number -->
         <div class="login__box">
           <i class="ri-phone-line login__icon"></i>
@@ -128,8 +162,12 @@
 
       const firstName = document.getElementById("first-name").value;
       const lastName = document.getElementById("last-name").value;
-      const email = document.getElementById("email").value;
+      const email = document.getElementById("email").value || null; // optional
+      const age = document.getElementById("age").value;
       const gender = document.getElementById("gender").value;
+      const city = document.getElementById("city").value;
+      const state = document.getElementById("state").value;
+      const disease = document.getElementById("disease").value;
       const mobile = document.getElementById("mobile").value;
       const password = document.getElementById("signup-pass").value;
       const confirmPassword = document.getElementById("confirm-pass").value;
@@ -143,7 +181,7 @@
         const res = await fetch("https://kanha-backend-yfx1.onrender.com/api/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ firstName, lastName, email, gender, mobile, password, confirmPassword })
+          body: JSON.stringify({ firstName, lastName, email, age, gender, city, state, disease, mobile, password, confirmPassword })
         });
 
         const result = await res.json();
