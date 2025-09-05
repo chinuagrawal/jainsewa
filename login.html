@@ -2,20 +2,18 @@
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MS3QJRDZ7C"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-MS3QJRDZ7C');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MS3QJRDZ7C"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MS3QJRDZ7C');
+  </script>
   <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#4a148c">
-
+  <meta name="theme-color" content="#4a148c">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login</title>
+  <title>Login (लॉगिन)</title>
   <link rel="stylesheet" href="./login.css">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
@@ -25,25 +23,24 @@
     <img src="images/news-image2.jpg" alt="login image" class="login__img">
 
     <form id="login-form" class="login__form">
-      <h1 class="login__title">Login</h1>
+      <h1 class="login__title">Login (लॉगिन)</h1>
 
       <div class="login__content">
-        <!-- Login ID (Email or Mobile) -->
+        <!-- Login ID (Mobile or Email) -->
         <div class="login__box">
           <i class="ri-user-line login__icon"></i>
           <div class="login__box-input">
             <input type="text" id="loginId" required class="login__input" placeholder=" " />
-            <label class="login__label">Email or Mobile</label>
+            <label class="login__label">Mobile or Email (मोबाइल या ईमेल)</label>
           </div>
         </div>
 
-        <!-- Password -->
+        <!-- DOB as Password -->
         <div class="login__box">
-          <i class="ri-lock-2-line login__icon"></i>
+          <i class="ri-calendar-line login__icon"></i>
           <div class="login__box-input">
-            <input type="password" id="password" required class="login__input" placeholder=" " />
-            <label class="login__label">Password</label>
-            <i class="ri-eye-off-line login__eye" id="login-eye"></i>
+            <input type="date" id="dob" required class="login__input" placeholder=" " />
+            <label class="login__label">Date of Birth (जन्म तिथि)</label>
           </div>
         </div>
       </div>
@@ -53,77 +50,59 @@
           <input type="checkbox" class="login__check-input">
           <label class="login__check-label">Remember me</label>
         </div>
-        <a href="#" class="login__forgot">Forgot Password?</a>
+        <a href="#" class="login__forgot">Forgot DOB?</a>
       </div>
 
-      <button type="submit" class="login__button">Login</button>
+      <button type="submit" class="login__button">Login (लॉगिन करें)</button>
 
       <p class="login__register">
-        Don't have an account? <a href="./signup.html">Register</a>
+        Don't have an account? (खाता नहीं है?) <br><a href="./signup.html">Register (पंजीकरण करें)</a>
       </p>
     </form>
   </div>
 
   <script>
-    // Toggle password visibility
-    const showHiddenPass = (passId, eyeId) => {
-      const input = document.getElementById(passId),
-            iconEye = document.getElementById(eyeId);
-
-      iconEye.addEventListener('click', () => {
-        if (input.type === 'password') {
-          input.type = 'text';
-          iconEye.classList.add('ri-eye-line');
-          iconEye.classList.remove('ri-eye-off-line');
-        } else {
-          input.type = 'password';
-          iconEye.classList.remove('ri-eye-line');
-          iconEye.classList.add('ri-eye-off-line');
-        }
-      });
-    };
-    showHiddenPass('password', 'login-eye');
-
     // Handle Login Form Submission
-document.getElementById("login-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
+    document.getElementById("login-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-  const loginId = document.getElementById("loginId").value.trim();
-  const password = document.getElementById("password").value;
+      const loginId = document.getElementById("loginId").value.trim();
+      const dob = document.getElementById("dob").value; // from date input
 
-  try {
-    const res = await fetch("https://kanha-backend-yfx1.onrender.com/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ loginId, password }) // ✅ send loginId
+      if (!dob) {
+        alert("Please enter your Date of Birth.");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ loginId, password: dob }) // backend expects "password"
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Login successful!");
+          localStorage.setItem("user", JSON.stringify(data.user));
+          if (data.user.role === "admin") {
+            window.location.href = "admin.html";
+          } else {
+            window.location.href = "index.html";
+          }
+        } else {
+          if (res.status === 403 && data.message.includes("blocked")) {
+            alert("❌ " + data.message);
+          } else {
+            alert(data.message || "Login failed");
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Server error");
+      }
     });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Login successful!");
-      localStorage.setItem("user", JSON.stringify(data.user));
-      if (data.user.role === "admin") {
-        window.location.href = "admin.html";
-      } else {
-        window.location.href = "index.html";
-      }
-    } else {
-      // ✅ Handle blocked user separately
-      if (res.status === 403 && data.message.includes("blocked")) {
-        alert("❌ " + data.message);
-      } else {
-        alert(data.message || "Login failed");
-      }
-    }
-  } catch (error) {
-    console.error(error);
-    alert("Server error");
-  }
-});
-
   </script>
 </body>
 </html>
