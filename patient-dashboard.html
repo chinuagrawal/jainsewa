@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard</title>
+  <link rel="stylesheet" href="./login.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .dashboard {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #4a148c;
+    }
+    .details {
+      margin-top: 20px;
+    }
+    .details p {
+      padding: 8px;
+      margin: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .pay-section {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .pay-button {
+      background: #4a148c;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .pay-button:hover {
+      background: #6a1b9a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard">
+    <h1>Patient Dashboard (मरीज डैशबोर्ड)</h1>
+
+    <div class="details">
+      <h2>My Details (मेरी जानकारी)</h2>
+      <p><strong>First Name:</strong> <span id="firstName"></span></p>
+      <p><strong>Last Name:</strong> <span id="lastName"></span></p>
+      <p><strong>Email:</strong> <span id="email"></span></p>
+      <p><strong>Date of Birth:</strong> <span id="dob"></span></p>
+      <p><strong>Gender:</strong> <span id="gender"></span></p>
+      <p><strong>City:</strong> <span id="city"></span></p>
+      <p><strong>State:</strong> <span id="state"></span></p>
+      <p><strong>Disease:</strong> <span id="disease"></span></p>
+      <p><strong>Mobile:</strong> <span id="mobile"></span></p>
+    </div>
+
+    <div class="pay-section">
+      <h2>Consulting Doctor Fees</h2>
+      <p>Amount: <strong>₹500</strong></p>
+      <button class="pay-button" onclick="startPayment()">Pay Now / अभी भुगतान करें</button>
+    </div>
+  </div>
+
+  <script>
+    // Load logged-in user details from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("Please login first");
+      window.location.href = "login.html";
+    } else {
+     fetch(`http://localhost:3000/api/user/${user.mobile}`)
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("firstName").innerText = data.firstName;
+    document.getElementById("lastName").innerText = data.lastName;
+    document.getElementById("email").innerText = data.email || "";
+    document.getElementById("dob").innerText = data.dob || "";
+    document.getElementById("gender").innerText = data.gender || "";
+    document.getElementById("city").innerText = data.city || "";
+    document.getElementById("state").innerText = data.state || "";
+    document.getElementById("disease").innerText = data.disease || "";
+    document.getElementById("mobile").innerText = data.mobile;
+  });
+    }
+
+
+
+    // Trigger payment (Example: PhonePe or Razorpay integration)
+    async function startPayment() {
+      try {
+        const res = await fetch("http://localhost:3000/api/payment/initiate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: 500, email: user.email, purpose: "Doctor Consultation" })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.redirectUrl) {
+          // Redirect to payment gateway
+          window.location.href = data.redirectUrl;
+        } else {
+          alert(data.message || "Payment initiation failed");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error while initiating payment");
+      }
+    }
+  </script>
+
+</body>
+</html>

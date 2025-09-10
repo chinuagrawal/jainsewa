@@ -89,7 +89,7 @@
           if (data.user.role === "admin") {
             window.location.href = "admin.html";
           } else {
-            window.location.href = "index.html";
+            window.location.href = "patient-dashboard.html";
           }
         } else {
           if (res.status === 403 && data.message.includes("blocked")) {

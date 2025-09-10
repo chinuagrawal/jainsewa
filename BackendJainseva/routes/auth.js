@@ -4,6 +4,7 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
 // Signup route
+// Signup route
 router.post('/signup', async (req, res) => {
   try {
     const { firstName, lastName, gender, mobile, email, dob, city, state, disease } = req.body;
@@ -13,21 +14,20 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'First name, last name, gender, mobile, and DOB are required.' });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { mobile }]
-    });
+    // ✅ Build query dynamically (only check email if filled)
+    const query = [{ mobile }];
+    if (email) query.push({ email });
+
+    const existingUser = await User.findOne({ $or: query });
 
     if (existingUser) {
-      const isEmailTaken = email && existingUser.email === email;
-      const isMobileTaken = existingUser.mobile === mobile;
-
-      return res.status(409).json({
-        message: isEmailTaken
-          ? 'Email already exists.'
-          : isMobileTaken
-          ? 'Mobile number already exists.'
-          : 'User already exists.'
-      });
+      if (email && existingUser.email === email) {
+        return res.status(409).json({ message: 'Email already exists.' });
+      }
+      if (existingUser.mobile === mobile) {
+        return res.status(409).json({ message: 'Mobile number already exists.' });
+      }
+      return res.status(409).json({ message: 'User already exists.' });
     }
 
     // ✅ Use DOB as password
@@ -38,7 +38,7 @@ router.post('/signup', async (req, res) => {
       lastName,
       gender,
       mobile,
-      email: email || null, // optional
+      email: email || null,
       dob,
       city,
       state,
@@ -47,13 +47,23 @@ router.post('/signup', async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User registered successfully.' });
+    res.status(201).json({
+      message: 'User registered successfully.',
+      user: {
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        mobile: newUser.mobile,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
 
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).json({ message: 'Server error.' });
   }
 });
+
 
 // Login route
 // Login route

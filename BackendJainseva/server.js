@@ -107,6 +107,16 @@ app.get('/api/users/me/:email', async (req, res) => {
   }
 });
 
+app.get("/api/user/:mobile", async (req, res) => {
+  try {
+    const user = await User.findOne({ mobile: req.params.mobile });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 
 // Utility function: get PhonePe Access Token
