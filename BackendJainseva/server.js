@@ -121,7 +121,7 @@ app.get("/api/user/:mobile", async (req, res) => {
 
 // Utility function: get PhonePe Access Token
 const getPhonePeAccessToken = async () => {
-  const baseUrl = 'https://api.phonepe.com/apis/identity-manager';
+  const baseUrl = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
   const clientId = process.env.PHONEPE_CLIENT_ID;
   const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
 
@@ -217,7 +217,7 @@ app.post('/api/payment/initiate', async (req, res) => {
     };
 
     const response = await axios.post(
-      `${baseUrl}/apis/pg/checkout/v2/pay`,
+      `${baseUrl}/apis/pg-sandbox/checkout/v2/pay`,
       payload,
       {
         headers: {
