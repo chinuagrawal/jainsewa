@@ -368,6 +368,9 @@
           })
         });
         const data = await res.json();
+         sessionStorage.setItem('pendingBooking', JSON.stringify({
+     txnId: data.merchantTransactionId
+  }));
         if(res.ok && data.redirectUrl) {
           window.location.href = data.redirectUrl;
         } else {
@@ -382,7 +385,7 @@
       }
     });
 
-    
+
     // Quick actions
     document.getElementById('logoutBtn').addEventListener('click', ()=> {
       localStorage.removeItem('user');
