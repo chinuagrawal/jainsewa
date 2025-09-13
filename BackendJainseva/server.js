@@ -240,6 +240,69 @@ app.post('/api/payment/initiate', async (req, res) => {
   }
 });
 
+// 📦 Status Check Route
+// ✅ PhonePe Payment Status using latest Order Status API
+app.get('/api/payment/status', async (req, res) => {
+  const { txnId } = req.query;
+
+  if (!txnId) {
+    return res.status(400).json({ code: 'MISSING_TXN_ID', message: 'Missing transaction ID' });
+  }
+
+  const baseUrl = 'https://api-preprod.phonepe.com'; // 🔐 UAT base
+  const clientId = process.env.PHONEPE_CLIENT_ID;
+  const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
+
+  try {
+    // ✅ Step 1: Get Access Token
+    const tokenRes = await axios.post(
+  `https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token`,
+
+      new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'client_credentials',
+        client_version: '1'
+      }).toString(),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }
+    );
+
+    const accessToken = tokenRes.data.access_token;
+
+    // ✅ Step 2: Check Order Status (txnId is merchantOrderId)
+    const statusRes = await axios.get(
+      `${baseUrl}/apis/pg-sandbox/checkout/v2/order/${txnId}/status?details=false`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `O-Bearer ${accessToken}`
+        }
+      }
+    );
+
+    const state = statusRes.data.state;
+
+    if (state === 'COMPLETED') {
+      res.json({ code: 'PAYMENT_SUCCESS' });
+    } else if (state === 'FAILED') {
+      res.json({ code: 'PAYMENT_FAILED' });
+    } else {
+      res.json({ code: 'PAYMENT_PENDING' });
+    }
+
+  } catch (err) {
+    console.error("❌ PhonePe status check error:", err.response?.data || err.message);
+    res.status(500).json({
+      code: 'PAYMENT_ERROR',
+      message: 'PhonePe status check failed',
+      error: err.response?.data || err.message
+    });
+  }
+});
+
+
 
 
 module.exports = router;
@@ -412,69 +475,6 @@ app.post('/api/book', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-// 📦 Status Check Route
-// ✅ PhonePe Payment Status using latest Order Status API
-app.get('/api/payment/status', async (req, res) => {
-  const { txnId } = req.query;
-
-  if (!txnId) {
-    return res.status(400).json({ code: 'MISSING_TXN_ID', message: 'Missing transaction ID' });
-  }
-
-  const baseUrl = 'https://api.phonepe.com'; // 🔐 UAT base
-  const clientId = process.env.PHONEPE_CLIENT_ID;
-  const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
-
-  try {
-    // ✅ Step 1: Get Access Token
-    const tokenRes = await axios.post(
-  `https://api.phonepe.com/apis/identity-manager/v1/oauth/token`,
-
-      new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'client_credentials',
-        client_version: '1'
-      }).toString(),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      }
-    );
-
-    const accessToken = tokenRes.data.access_token;
-
-    // ✅ Step 2: Check Order Status (txnId is merchantOrderId)
-    const statusRes = await axios.get(
-      `${baseUrl}/apis/pg/checkout/v2/order/${txnId}/status?details=false`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `O-Bearer ${accessToken}`
-        }
-      }
-    );
-
-    const state = statusRes.data.state;
-
-    if (state === 'COMPLETED') {
-      res.json({ code: 'PAYMENT_SUCCESS' });
-    } else if (state === 'FAILED') {
-      res.json({ code: 'PAYMENT_FAILED' });
-    } else {
-      res.json({ code: 'PAYMENT_PENDING' });
-    }
-
-  } catch (err) {
-    console.error("❌ PhonePe status check error:", err.response?.data || err.message);
-    res.status(500).json({
-      code: 'PAYMENT_ERROR',
-      message: 'PhonePe status check failed',
-      error: err.response?.data || err.message
-    });
-  }
-});
-
 
 
 // Start Server
