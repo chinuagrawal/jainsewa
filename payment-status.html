@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#4a148c">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checking Payment Status...</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(to right, #f3e5f5, #e1f5fe);
+    }
+    h2 {
+      color: #6a1b9a;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #6a1b9a;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+  <h2 id="status">✅ Checking Payment Status, please wait...</h2>
+  <div class="spinner"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const txnId = urlParams.get('txnId');
+
+    let booking = null;
+    try {
+      booking = JSON.parse(sessionStorage.getItem('pendingBooking'));
+    } catch (e) {
+      booking = null;
+    }
+
+    if (!txnId || !booking) {
+      document.body.innerHTML = "<h2>❌ Missing payment details.</h2>";
+    } else {
+      fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === "PAYMENT_SUCCESS") {
+            // ✅ Payment confirmed, assume webhook will create booking
+            sessionStorage.removeItem('pendingBooking');
+            const query = `?success=1&seatId=${booking.seatId}&shift=${booking.shift}&startDate=${booking.startDate}&endDate=${booking.endDate}`;
+            window.location.href = `index.html${query}`;
+          } else {
+            document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.body.innerHTML = `<h2>⚠️ Error checking payment status.</h2>`;
+        });
+    }
+  </script>
+</body>
+</html>
