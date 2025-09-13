@@ -293,7 +293,7 @@
     document.getElementById('avatar').innerText = (user.firstName ? user.firstName.charAt(0).toUpperCase() : 'P') + (user.lastName ? user.lastName.charAt(0).toUpperCase() : '');
 
     // Fetch full user details
-    fetch(`http://localhost:3000/api/user/${user.mobile}`)
+    fetch(`https://jainsewa-backend.onrender.com/api/user/${user.mobile}`)
       .then(r => {
         if(!r.ok) throw new Error('Failed to fetch');
         return r.json();
@@ -355,7 +355,7 @@
       confirmPay.disabled = true;
 
       try {
-        const res = await fetch('http://localhost:3000/api/payment/initiate', {
+        const res = await fetch('https://jainsewa-backend.onrender.com/api/payment/initiate', {
           method:'POST',
           headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify({
