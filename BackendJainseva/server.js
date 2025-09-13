@@ -249,7 +249,7 @@ app.get('/api/payment/status', async (req, res) => {
     return res.status(400).json({ code: 'MISSING_TXN_ID', message: 'Missing transaction ID' });
   }
 
-  const baseUrl = 'https://api-preprod.phonepe.com'; // 🔐 UAT base
+  const baseUrl = 'https://api-preprod.phonepe.com/apis/pg-sandbox'; // 🔐 UAT base
   const clientId = process.env.PHONEPE_CLIENT_ID;
   const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
 
@@ -273,7 +273,7 @@ app.get('/api/payment/status', async (req, res) => {
 
     // ✅ Step 2: Check Order Status (txnId is merchantOrderId)
     const statusRes = await axios.get(
-      `${baseUrl}/apis/pg-sandbox/checkout/v2/order/${txnId}/status?details=false`,
+      `${baseUrl}/checkout/v2/order/${txnId}/status?details=false`,
       {
         headers: {
           'Content-Type': 'application/json',
