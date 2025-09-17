@@ -277,7 +277,7 @@ app.get('/api/payment/status', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
+          'Authorization': `O-Bearer ${accessToken}`
         }
       }
     );
