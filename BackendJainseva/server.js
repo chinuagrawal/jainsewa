@@ -173,7 +173,7 @@ app.get('/api/bookings', async (req, res) => {
 
 
 
-const PendingAppointment = require('../models/PendingAppointment');
+const PendingAppointment = require('./models/PendingAppointment');
 
 app.post('/api/payment/initiate', async (req, res) => {
   const { amount, email, mobile, purpose, notes, paymentMethod } = req.body;
