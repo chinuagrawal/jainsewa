@@ -47,7 +47,7 @@
       booking = null;
     }
 
-    if (!txnId || !booking) {
+    if (!txnId ) {
       document.body.innerHTML = "<h2>❌ Missing payment details.</h2>";
     } else {
       fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`)
