@@ -23,7 +23,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Models & Routes
-const Booking = require('./models/Booking');
+
 const User = require('./models/User');
 const authRoutes = require('./routes/auth');
 const webhookRoutes = require('./routes/webhook');
