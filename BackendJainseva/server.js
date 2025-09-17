@@ -172,52 +172,61 @@ app.get('/api/bookings', async (req, res) => {
 
 
 
-// routes/initiate.js or in your main route file
+const axios = require('axios');
+const PendingAppointment = require('../models/PendingAppointment');
+
 app.post('/api/payment/initiate', async (req, res) => {
-  const { amount, email, seatId, shift, startDate, endDate } = req.body;
+  const { amount, email, mobile, purpose, notes, paymentMethod } = req.body;
   const merchantTransactionId = 'TXN_' + Date.now();
   const merchantId = process.env.PHONEPE_MERCHANT_ID;
   const baseUrl = process.env.PHONEPE_BASE_URL;
   const redirectUrl = `${process.env.PHONEPE_REDIRECT_URL}?txnId=${merchantTransactionId}`;
-  
+
   console.log(`✅ PhonePe Payment initiated for ${email}, TXN: ${merchantTransactionId}`);
+
   try {
-    // ✅ Save pending booking
-    await PendingBooking.create({
-  txnId: merchantTransactionId,
-  email,
-  amount,
-  status: 'pending',
-  seatId,
-  startDate,
-  endDate,
-  shift
-});
+    // ✅ Save pending appointment
+    await PendingAppointment.create({
+      txnId: merchantTransactionId,
+      email,
+      mobile,
+      amount,
+      purpose,
+      notes,
+      status: 'pending'
+    });
 
+    // ✅ Get PhonePe Access Token
+    const tokenRes = await axios.post(
+      `${baseUrl}/v1/oauth/token`,
+      new URLSearchParams({
+        client_id: process.env.PHONEPE_CLIENT_ID,
+        client_secret: process.env.PHONEPE_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+        client_version: '1'
+      }).toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
 
-    // ✅ Get PhonePe token
-    const accessToken = await getPhonePeAccessToken();
+    const accessToken = tokenRes.data.access_token;
 
-    // ✅ Create payload
+    // ✅ Prepare payload
     const payload = {
       merchantId,
       merchantOrderId: merchantTransactionId,
       amount: amount * 100,
       expireAfter: 1200,
-      metaInfo: {
-        udf1: email,
-      },
+      metaInfo: { udf1: email },
       paymentFlow: {
         type: 'PG_CHECKOUT',
         redirectMode: 'AUTO',
-        merchantUrls: {
-          redirectUrl,
-        },
+        merchantUrls: { redirectUrl }
       },
     };
 
+    // ✅ Call PhonePe Initiate API
     const response = await axios.post(
-      `${baseUrl}/apis/pg-sandbox/checkout/v2/pay`,
+      `${baseUrl}/checkout/v2/pay`,
       payload,
       {
         headers: {
@@ -240,27 +249,26 @@ app.post('/api/payment/initiate', async (req, res) => {
   }
 });
 
-// 📦 Status Check Route
-// ✅ PhonePe Payment Status using latest Order Status API
+
+
+
+
+// Endpoint: Check payment status
 app.get('/api/payment/status', async (req, res) => {
   const { txnId } = req.query;
-
   if (!txnId) {
     return res.status(400).json({ code: 'MISSING_TXN_ID', message: 'Missing transaction ID' });
   }
 
-  const baseUrl = 'https://api-preprod.phonepe.com/apis/pg-sandbox'; // 🔐 UAT base
-  const clientId = process.env.PHONEPE_CLIENT_ID;
-  const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
+  const baseUrl = process.env.PHONEPE_BASE_URL;
 
   try {
     // ✅ Step 1: Get Access Token
     const tokenRes = await axios.post(
-  `https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token`,
-
+      `${baseUrl}/v1/oauth/token`,
       new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
+        client_id: process.env.PHONEPE_CLIENT_ID,
+        client_secret: process.env.PHONEPE_CLIENT_SECRET,
         grant_type: 'client_credentials',
         client_version: '1'
       }).toString(),
@@ -271,7 +279,7 @@ app.get('/api/payment/status', async (req, res) => {
 
     const accessToken = tokenRes.data.access_token;
 
-    // ✅ Step 2: Check Order Status (txnId is merchantOrderId)
+    // ✅ Step 2: Check Order Status
     const statusRes = await axios.get(
       `${baseUrl}/checkout/v2/order/${txnId}/status?details=false`,
       {
@@ -285,11 +293,13 @@ app.get('/api/payment/status', async (req, res) => {
     const state = statusRes.data.state;
 
     if (state === 'COMPLETED') {
-      res.json({ code: 'PAYMENT_SUCCESS' });
+      await PendingAppointment.findOneAndUpdate({ txnId }, { status: 'completed' });
+      return res.json({ code: 'PAYMENT_SUCCESS' });
     } else if (state === 'FAILED') {
-      res.json({ code: 'PAYMENT_FAILED' });
+      await PendingAppointment.findOneAndUpdate({ txnId }, { status: 'failed' });
+      return res.json({ code: 'PAYMENT_FAILED' });
     } else {
-      res.json({ code: 'PAYMENT_PENDING' });
+      return res.json({ code: 'PAYMENT_PENDING' });
     }
 
   } catch (err) {
@@ -301,6 +311,7 @@ app.get('/api/payment/status', async (req, res) => {
     });
   }
 });
+
 
 
 
