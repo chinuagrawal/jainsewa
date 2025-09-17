@@ -182,7 +182,7 @@ app.post('/api/payment/initiate', async (req, res) => {
   const baseUrl = process.env.PHONEPE_BASE_URL;
   const redirectUrl = `${process.env.PHONEPE_REDIRECT_URL}?txnId=${merchantTransactionId}`;
 
-  console.log(`✅ PhonePe Payment initiated for ${email}, TXN: ${merchantTransactionId}`);
+  console.log(`✅ PhonePe Payment initiated for ${mobile}, TXN: ${merchantTransactionId}`);
 
   try {
     // ✅ Save pending appointment
@@ -206,7 +206,7 @@ app.post('/api/payment/initiate', async (req, res) => {
       merchantOrderId: merchantTransactionId,
       amount: amount * 100,
       expireAfter: 1200,
-      metaInfo: { udf1: email },
+      metaInfo: { udf1: mobile },
       paymentFlow: {
         type: 'PG_CHECKOUT',
         redirectMode: 'AUTO',
