@@ -172,7 +172,7 @@ app.get('/api/bookings', async (req, res) => {
 
 
 
-const axios = require('axios');
+
 const PendingAppointment = require('../models/PendingAppointment');
 
 app.post('/api/payment/initiate', async (req, res) => {
