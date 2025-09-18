@@ -188,7 +188,6 @@ app.post('/api/payment/initiate', async (req, res) => {
     // ✅ Save pending appointment
     await PendingAppointment.create({
       txnId: merchantTransactionId,
-      email,
       mobile,
       amount,
       purpose,
