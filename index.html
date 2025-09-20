@@ -191,6 +191,134 @@ http://www.tooplate.com/view/2098-health
   <div class="carousel-indicators" aria-hidden="false"></div>
 </div>
 
+<!-- MAKE AN APPOINTMENT -->
+<section id="appointment" data-stellar-background-ratio="3">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-6 col-sm-6">
+        <img src="images/appointment-image.jpg" class="img-responsive" alt="">
+      </div>
+
+      <div class="col-md-6 col-sm-6">
+        <!-- CONTACT FORM HERE -->
+        <form id="appointment-form" role="form">
+
+          <!-- SECTION TITLE -->
+          <div class="section-title wow fadeInUp" data-wow-delay="0.4s">
+            <h2>Make an Appointment / पंजीकरण</h2>
+          </div>
+
+          <div class="wow fadeInUp" data-wow-delay="0.8s">
+            
+            <div class="col-md-6 col-sm-6">
+              <label for="first-name">First Name / पहला नाम</label>
+              <input type="text" class="form-control" id="first-name" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="last-name">Last Name / अंतिम नाम</label>
+              <input type="text" class="form-control" id="last-name" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="email">Email (optional)</label>
+              <input type="email" class="form-control" id="email">
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="dob">Date of Birth / जन्म तिथि</label>
+              <input type="date" class="form-control" id="dob" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="gender">Gender / लिंग</label>
+              <select id="gender" class="form-control" required>
+                <option value="" disabled selected hidden>Select Gender</option>
+                <option value="male">Male (पुरुष)</option>
+                <option value="female">Female (महिला)</option>
+                <option value="other">Other (अन्य)</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="city">City / शहर</label>
+              <input type="text" class="form-control" id="city" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="state">State / राज्य</label>
+              <input type="text" class="form-control" id="state" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="disease">Disease / बीमारी</label>
+              <input type="text" class="form-control" id="disease" required>
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+              <label for="mobile">Mobile Number / मोबाइल नंबर</label>
+              <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+              <button type="submit" class="form-control btn btn-primary" id="cf-submit">Book Appointment</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+document.getElementById("appointment-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const firstName = document.getElementById("first-name").value;
+  const lastName = document.getElementById("last-name").value;
+  const email = document.getElementById("email").value || null;
+  const dob = document.getElementById("dob").value;
+  const gender = document.getElementById("gender").value;
+  const city = document.getElementById("city").value;
+  const state = document.getElementById("state").value;
+  const disease = document.getElementById("disease").value;
+  const mobile = document.getElementById("mobile").value;
+
+  const password = dob; // same trick as signup
+
+  try {
+    const res = await fetch("https://jainsewa-backend.onrender.com/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName, lastName, email, dob, gender, city, state, disease, mobile, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ Appointment / Registration successful!");
+
+      // auto login
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // redirect same as signup
+      if (data.user && data.user.role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "patient-dashboard.html";
+      }
+    } else {
+      alert(data.message || "❌ Failed to book appointment");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    alert("⚠️ Something went wrong. Please try again later.");
+  }
+});
+</script>
+
   <!-- TEAM -->
   <section id="team" data-stellar-background-ratio="1">
     <div class="container">
@@ -348,67 +476,6 @@ http://www.tooplate.com/view/2098-health
       </div>
     </div>
   </section>
-
-
-  <!-- MAKE AN APPOINTMENT -->
-  <section id="appointment" data-stellar-background-ratio="3">
-    <div class="container">
-      <div class="row">
-
-        <div class="col-md-6 col-sm-6">
-          <img src="images/appointment-image.jpg" class="img-responsive" alt="">
-        </div>
-
-        <div class="col-md-6 col-sm-6">
-          <!-- CONTACT FORM HERE -->
-          <form id="appointment-form" role="form" method="post" action="#">
-
-            <!-- SECTION TITLE -->
-            <div class="section-title wow fadeInUp" data-wow-delay="0.4s">
-              <h2>Make an appointment</h2>
-            </div>
-
-            <div class="wow fadeInUp" data-wow-delay="0.8s">
-              <div class="col-md-6 col-sm-6">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
-              </div>
-
-              <div class="col-md-6 col-sm-6">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Your Email">
-              </div>
-
-              <div class="col-md-6 col-sm-6">
-                <label for="date">Select Date</label>
-                <input type="date" name="date" value="" class="form-control">
-              </div>
-
-              <div class="col-md-6 col-sm-6">
-                <label for="select">Select Department</label>
-                <select class="form-control">
-                  <option>General Health</option>
-                  <option>Cardiology</option>
-                  <option>Dental</option>
-                  <option>Medical Research</option>
-                </select>
-              </div>
-
-              <div class="col-md-12 col-sm-12">
-                <label for="telephone">Phone Number</label>
-                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone">
-                <label for="Message">Additional Message</label>
-                <textarea class="form-control" rows="5" id="message" name="message" placeholder="Message"></textarea>
-                <button type="submit" class="form-control" id="cf-submit" name="submit">Submit Button</button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
 
   <!-- GOOGLE MAP -->
   <section id="google-map">
