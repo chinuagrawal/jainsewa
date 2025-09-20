@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#4a148c">
-
+  <meta name="theme-color" content="#4a148c">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Checking Payment Status...</title>
@@ -11,11 +10,17 @@
     body {
       font-family: 'Poppins', sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 40px 20px;
       background: linear-gradient(to right, #f3e5f5, #e1f5fe);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     h2 {
       color: #6a1b9a;
+      font-size: 1.4rem;
+      line-height: 1.5;
     }
     .spinner {
       border: 6px solid #f3f3f3;
@@ -24,13 +29,25 @@
       width: 50px;
       height: 50px;
       animation: spin 1s linear infinite;
-      margin: 20px auto;
+      margin: 25px auto;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-</style>
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 15px;
+      }
+      h2 {
+        font-size: 1.2rem;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
 </head>
 <body>
   <h2 id="status">✅ Checking Payment Status, please wait...</h2>
@@ -40,24 +57,46 @@
     const urlParams = new URLSearchParams(window.location.search);
     const txnId = urlParams.get('txnId');
 
-    let booking = null;
+    let appointment = null;
     try {
-      booking = JSON.parse(sessionStorage.getItem('pendingBooking'));
+      appointment = JSON.parse(sessionStorage.getItem('pendingAppointment'));
     } catch (e) {
-      booking = null;
+      appointment = null;
     }
 
-    if (!txnId ) {
-      document.body.innerHTML = "<h2>❌ Missing payment details.</h2>";
+    if (!txnId) {
+      document.body.innerHTML = "<h2>❌ Missing payment or appointment details.</h2>";
     } else {
       fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`)
         .then(res => res.json())
         .then(data => {
           if (data.code === "PAYMENT_SUCCESS") {
-            // ✅ Payment confirmed, assume webhook will create booking
-            sessionStorage.removeItem('pendingBooking');
-            const query = `?success=1&seatId=${booking.seatId}&shift=${booking.shift}&startDate=${booking.startDate}&endDate=${booking.endDate}`;
-            window.location.href = `index.html${query}`;
+            document.getElementById('status').innerText = "💜 Payment confirmed! Booking your appointment...";
+
+            // ✅ Confirm appointment in backend
+            fetch('https://jainsewa-backend.onrender.com/api/appointments/confirm', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ...appointment,
+                txnId: txnId,
+                status: 'paid'
+              })
+            })
+            .then(r => r.json())
+            .then(result => {
+              if (result.success) {
+                sessionStorage.removeItem('pendingAppointment');
+                window.location.href = `patient-dashboard.html?success=1&appointmentId=${result.appointmentId}`;
+              } else {
+                document.body.innerHTML = `<h2>⚠️ Payment done but appointment booking failed.<br>Please contact support.</h2>`;
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              document.body.innerHTML = `<h2>⚠️ Payment done but booking API failed.<br>Contact support.</h2>`;
+            });
+
           } else {
             document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
           }

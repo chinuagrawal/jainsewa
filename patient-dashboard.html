@@ -233,10 +233,12 @@
   <div class="paybar" aria-hidden="false">
     <div class="paybar-inner">
       <div class="pay-cta">
+        
         <div style="display:flex;flex-direction:column">
-          <div style="font-size:13px;color:var(--muted)">Consultation Fee</div>
-          <div class="pay-price">₹<span id="feeAmount">500</span></div>
-        </div>
+  <div id="feeLabel" style="font-size:13px;color:var(--muted)">Consultation Fee</div>
+  <div class="pay-price">₹<span id="feeAmount">59</span></div>
+</div>
+
         <div style="flex:1"></div>
         <button class="pay-button" id="openPay"><i class="ri-wallet-line"></i> Pay Now</button>
       </div>
@@ -257,7 +259,7 @@
     </div>
 
     <div class="row">
-      <div><small>Fee</small><div id="s_fee"><strong>₹500</strong></div></div>
+      <div><small>Fee</small><div id="s_fee"><strong>₹59</strong></div></div>
       <div style="text-align:right"><small>Payment Method</small><div><select id="paymentMethod" style="padding:8px;border-radius:8px;border:1px solid #eee">
         <option value="phonepe">PhonePe</option>
         <option value="upi">UPI</option>
@@ -281,6 +283,7 @@
     }
 
     const feeAmount = document.getElementById('feeAmount');
+    const feeLabelDiv = document.getElementById('feeLabel');
     const sheet = document.getElementById('sheet');
     const openPay = document.getElementById('openPay');
     const closeSheet = document.getElementById('closeSheet');
@@ -293,45 +296,55 @@
     document.getElementById('avatar').innerText = (user.firstName ? user.firstName.charAt(0).toUpperCase() : 'P') + (user.lastName ? user.lastName.charAt(0).toUpperCase() : '');
 
     // Fetch full user details
-    fetch(`https://jainsewa-backend.onrender.com/api/user/${user.mobile}`)
-      .then(r => {
-        if(!r.ok) throw new Error('Failed to fetch');
-        return r.json();
-      })
-      .then(data => {
-        const keys = [
-          ['First Name', 'firstName'],
-          ['Last Name', 'lastName'],
-          ['Email', 'email'],
-          ['DOB', 'dob'],
-          ['Gender', 'gender'],
-          ['City', 'city'],
-          ['State', 'state'],
-          ['Disease', 'disease'],
-          ['Mobile', 'mobile']
-        ];
-        const grid = document.getElementById('detailsGrid');
-        grid.innerHTML = '';
-        keys.forEach(([label, key])=>{
-          const div = document.createElement('div');
-          div.className = 'kv';
-          div.innerHTML = `<b>${label}</b><span>${data[key] || 'N/A'}</span>`;
-          grid.appendChild(div);
-        });
+    // --- Fetch full user details (replace the old fetch)
+fetch(`https://jainsewa-backend.onrender.com/api/user?mobile=${encodeURIComponent(user.mobile)}`)
+  .then(r => {
+    if (r.status === 400) throw new Error('Missing mobile on request');
+    if (r.status === 404) return null; // user not found
+    if (!r.ok) throw new Error('Failed to fetch user: ' + r.status);
+    return r.json();
+  })
+  .then(data => {
+    if (!data) {
+      console.warn('User not found');
+      // optionally clear UI or redirect to signup
+      return;
+    }
 
-        document.getElementById('pname').innerText = `${data.firstName || ''} ${data.lastName || ''}`.trim() || '—';
-        document.getElementById('pemail').innerText = data.email || '—';
-        document.getElementById('pmobile').innerText = data.mobile || '—';
-        document.getElementById('s_name').innerText = document.getElementById('pname').innerText;
-        document.getElementById('s_mobile').innerText = data.mobile || '—';
+    const keys = [
+      ['First Name', 'firstName'],
+      ['Last Name', 'lastName'],
+      ['Email', 'email'],
+      ['DOB', 'dob'],
+      ['Gender', 'gender'],
+      ['City', 'city'],
+      ['State', 'state'],
+      ['Disease', 'disease'],
+      ['Mobile', 'mobile']
+    ];
+    const grid = document.getElementById('detailsGrid');
+    grid.innerHTML = '';
+    keys.forEach(([label, key])=>{
+      const div = document.createElement('div');
+      div.className = 'kv';
+      div.innerHTML = `<b>${label}</b><span>${data[key] || 'N/A'}</span>`;
+      grid.appendChild(div);
+    });
 
-        document.getElementById('paymentsList').innerHTML = `<div style="color:var(--muted)">No recent payments</div>`;
-        document.getElementById('totalConsults').innerText = 0;
-        document.getElementById('pending').innerText = 0;
-      })
-      .catch(err => {
-        console.error(err);
-      });
+    document.getElementById('pname').innerText = `${data.firstName || ''} ${data.lastName || ''}`.trim() || '—';
+    document.getElementById('pemail').innerText = data.email || '—';
+    document.getElementById('pmobile').innerText = data.mobile || '—';
+    document.getElementById('s_name').innerText = document.getElementById('pname').innerText;
+    document.getElementById('s_mobile').innerText = data.mobile || '—';
+
+    // You can populate payments/summary if available
+    document.getElementById('paymentsList').innerHTML = `<div style="color:var(--muted)">No recent payments</div>`;
+    // totalConsults/pending could be set after fetching appointments
+  })
+  .catch(err => {
+    console.error('User fetch error:', err);
+  });
+
 
     // Payment sheet open/close
     openPay.addEventListener('click', ()=> {
@@ -349,7 +362,7 @@
     confirmPay.addEventListener('click', async function(){
       const notes = document.getElementById('payNotes').value || '';
       const paymentMethod = document.getElementById('paymentMethod').value || 'phonepe';
-      const amount = Number(feeAmount.innerText) || 500;
+      const amount = Number(feeAmount.innerText) || 59;
 
       confirmPay.innerText = 'Processing...';
       confirmPay.disabled = true;
@@ -371,6 +384,14 @@
          sessionStorage.setItem('pendingBooking', JSON.stringify({
      txnId: data.merchantTransactionId
   }));
+  sessionStorage.setItem('pendingAppointment', JSON.stringify({
+  email: user.email,
+  mobile: user.mobile,
+  name: `${user.firstName} ${user.lastName}`,
+  fee: amount,
+  notes,
+}));
+
         if(res.ok && data.redirectUrl) {
           window.location.href = data.redirectUrl;
         } else {
@@ -384,6 +405,52 @@
         confirmPay.disabled = false;
       }
     });
+
+//
+
+// Fetch patient's existing appointments to determine fee and label
+fetch(`https://jainsewa-backend.onrender.com/api/appointments?mobile=${user.mobile}`)
+  .then(r => r.json())
+  .then(list => {
+    const container = document.getElementById('appts');
+    const feeAmount = document.getElementById('feeAmount'); // make sure these exist
+    const feeLabelDiv = document.getElementById('feeLabel');
+
+    container.innerHTML = '';
+
+    // Determine consultation fee and label based on previous appointments
+    let baseFee = 59;
+    let feeLabel = "Consultation Fee";
+    if (list.length >= 1) { // patient already has 1 appointment
+      baseFee = 48;
+      feeLabel = "Reconsultation Fee";
+    }
+
+    // Update paybar only if elements exist
+    if (feeAmount) feeAmount.innerText = baseFee;
+    if (feeLabelDiv) feeLabelDiv.innerText = feeLabel;
+
+    // Render upcoming appointments
+    if (!list.length) {
+      container.innerHTML = `<div style="color:var(--muted)">No upcoming appointments</div>`;
+      return;
+    }
+
+    list.forEach(appt => {
+      const div = document.createElement('div');
+      div.className = 'appt';
+      div.innerHTML = `
+        <div>
+          <div><b>${appt.doctor}</b></div>
+          <div style="font-size:13px;color:var(--muted)">${new Date(appt.createdAt).toLocaleDateString()}</div>
+        </div>
+        <div style="color:var(--accent);font-weight:600">₹${appt.fee}</div>
+      `;
+      container.appendChild(div);
+    });
+  })
+  .catch(err => console.error(err));
+
 
 
     // Quick actions

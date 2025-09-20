@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 
 const AppointmentSchema = new mongoose.Schema({
   appointmentId: { type: String, required: true, unique: true },
-  userEmail: { type: String, required: true },
+  userEmail: { type: String},
   userMobile: { type: String },
   doctor: { type: String, default: 'General' },
   date: { type: Date },
   notes: { type: String },
-  fee: { type: Number, required: true },
+  fee: { type: Number},
   paymentTxnId: { type: String },
+  paymentMethod: { type: String, default: 'online' },
   status: { type: String, enum: ['confirmed', 'cancelled'], default: 'confirmed' },
   createdAt: { type: Date, default: Date.now }
 });

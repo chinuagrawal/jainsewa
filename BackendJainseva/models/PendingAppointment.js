@@ -7,7 +7,6 @@ const PendingAppointmentSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   purpose: { type: String, default: 'Doctor Consultation' },
   notes: { type: String },
-  paymentMethod: { type: String, enum: ['phonepe', 'upi', 'card'], default: 'phonepe' },
   status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
   createdAt: { type: Date, default: Date.now }
 });

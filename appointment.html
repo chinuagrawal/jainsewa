@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Appointments</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    input, select, button { padding: 5px; margin: 5px; }
+    .cancelled { background-color: #fdd; }
+  </style>
+</head>
+<body>
+  <h2>All Appointments</h2>
+
+  <div>
+    <label>Status:</label>
+    <select id="statusFilter">
+      <option value="">All</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+
+    <label>From:</label>
+    <input type="date" id="fromDate">
+
+    <label>To:</label>
+    <input type="date" id="toDate">
+
+    <label>Quick:</label>
+    <select id="periodFilter">
+      <option value="">Select</option>
+      <option value="7">Last 7 Days</option>
+      <option value="30">Last 30 Days</option>
+      <option value="90">Last 90 Days</option>
+    </select>
+
+    <button id="filterBtn">Filter</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+       
+        <th>Patient Name</th>
+        <th>Mobile</th>
+        <th>Email</th>
+        <th>Doctor</th>
+        <th>Date</th>
+        <th>Fee</th>
+        <th>Payment TXN</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody id="appointmentsTable"></tbody>
+  </table>
+
+  <script>
+    const tableBody = document.getElementById('appointmentsTable');
+    const filterBtn = document.getElementById('filterBtn');
+
+    function buildQuery() {
+      const status = document.getElementById('statusFilter').value;
+      const from = document.getElementById('fromDate').value;
+      const to = document.getElementById('toDate').value;
+      const period = document.getElementById('periodFilter').value;
+      const q = [];
+      if (status) q.push(`status=${encodeURIComponent(status)}`);
+      if (from) q.push(`from=${encodeURIComponent(from)}`);
+      if (to) q.push(`to=${encodeURIComponent(to)}`);
+      if (period) q.push(`period=${encodeURIComponent(period)}`);
+      return q.length ? `?${q.join('&')}` : '';
+    }
+
+    async function fetchAppointments() {
+      try {
+        const url = `https://jainsewa-backend.onrender.com/api/admin/appointments${buildQuery()}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch appointments");
+
+        let data = await res.json();
+
+        // Sort newest first (server already sorts)
+        data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        tableBody.innerHTML = '';
+        if (data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="10">No appointments found</td></tr>`;
+          return;
+        }
+
+        data.forEach(appt => {
+          const row = `<tr class="${appt.status === 'cancelled' ? 'cancelled' : ''}">
+            
+            <td>${appt.patientName || '-'}</td>
+            <td>${appt.userMobile || '-'}</td>
+            <td>${appt.patientEmail || appt.userEmail || '-'}</td>
+            <td>${appt.doctor || '-'}</td>
+            <td>${appt.date ? new Date(appt.date).toLocaleString() : '-'}</td>
+            <td>${appt.fee != null ? appt.fee : 0}</td>
+            
+            <td>${appt.paymentTxnId || '-'}</td>
+            <td>${appt.createdAt ? new Date(appt.createdAt).toLocaleString() : '-'}</td>
+          </tr>`;
+          tableBody.innerHTML += row;
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Error fetching appointments');
+      }
+    }
+
+    filterBtn.addEventListener('click', fetchAppointments);
+
+    // Initial load
+    fetchAppointments();
+  </script>
+</body>
+</html>
