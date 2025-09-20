@@ -10,6 +10,7 @@
     th { background-color: #f2f2f2; }
     input, select, button { padding: 5px; margin: 5px; }
     .cancelled { background-color: #fdd; }
+    .checked-row { background-color: #e6ffe6; } /* highlight viewed patients */
   </style>
 </head>
 <body>
@@ -43,7 +44,7 @@
   <table>
     <thead>
       <tr>
-       
+        <th>Viewed</th> <!-- new column -->
         <th>Patient Name</th>
         <th>Mobile</th>
         <th>Email</th>
@@ -81,8 +82,6 @@
         if (!res.ok) throw new Error("Failed to fetch appointments");
 
         let data = await res.json();
-
-        // Sort newest first (server already sorts)
         data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         tableBody.innerHTML = '';
@@ -92,19 +91,42 @@
         }
 
         data.forEach(appt => {
-          const row = `<tr class="${appt.status === 'cancelled' ? 'cancelled' : ''}">
-            
+          const row = document.createElement('tr');
+          row.className = appt.status === 'cancelled' ? 'cancelled' : '';
+
+          // mark as viewed if already set in DB
+          if (appt.viewed) row.classList.add('checked-row');
+
+          row.innerHTML = `
+            <td><input type="checkbox" ${appt.viewed ? "checked" : ""}></td>
             <td>${appt.patientName || '-'}</td>
             <td>${appt.userMobile || '-'}</td>
             <td>${appt.patientEmail || appt.userEmail || '-'}</td>
             <td>${appt.doctor || '-'}</td>
             <td>${appt.date ? new Date(appt.date).toLocaleString() : '-'}</td>
             <td>${appt.fee != null ? appt.fee : 0}</td>
-            
             <td>${appt.paymentTxnId || '-'}</td>
             <td>${appt.createdAt ? new Date(appt.createdAt).toLocaleString() : '-'}</td>
-          </tr>`;
-          tableBody.innerHTML += row;
+          `;
+
+          const checkbox = row.querySelector("input[type=checkbox]");
+          checkbox.addEventListener("change", async () => {
+            const viewed = checkbox.checked;
+            row.classList.toggle('checked-row', viewed);
+
+            // update backend
+            try {
+              await fetch(`https://jainsewa-backend.onrender.com/api/admin/appointments/${appt._id}/viewed`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ viewed })
+              });
+            } catch (err) {
+              console.error("Error updating viewed:", err);
+            }
+          });
+
+          tableBody.appendChild(row);
         });
       } catch (err) {
         console.error(err);

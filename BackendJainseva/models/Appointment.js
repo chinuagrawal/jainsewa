@@ -11,6 +11,8 @@ const AppointmentSchema = new mongoose.Schema({
   paymentTxnId: { type: String },
   paymentMethod: { type: String, default: 'online' },
   status: { type: String, enum: ['confirmed', 'cancelled'], default: 'confirmed' },
+  viewed: { type: Boolean, default: false },
+
   createdAt: { type: Date, default: Date.now }
 });
 

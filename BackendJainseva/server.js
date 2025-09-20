@@ -221,6 +221,21 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
+// PUT /api/admin/appointments/:id/viewed
+app.put('/api/admin/appointments/:id/viewed', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { viewed } = req.body;
+    const appt = await Appointment.findByIdAndUpdate(
+      id,
+      { viewed },
+      { new: true }
+    );
+    res.json(appt);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating viewed" });
+  }
+});
 
 
 
