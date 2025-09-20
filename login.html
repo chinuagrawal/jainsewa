@@ -86,8 +86,8 @@
         if (res.ok) {
           alert("Login successful!");
           localStorage.setItem("user", JSON.stringify(data.user));
-          if (data.user.role === "admin") {
-            window.location.href = "admin.html";
+          if (data.user.role === "doctor") {
+            window.location.href = "doctorPanel.html";
           } else {
             window.location.href = "patient-dashboard.html";
           }
