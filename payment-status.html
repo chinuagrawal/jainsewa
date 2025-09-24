@@ -57,46 +57,34 @@
     const urlParams = new URLSearchParams(window.location.search);
     const txnId = urlParams.get('txnId');
 
+    let appointment = null;
+    try {
+      appointment = JSON.parse(sessionStorage.getItem('pendingAppointment'));
+    } catch (e) {
+      appointment = null;
+    }
+
     if (!txnId) {
       document.body.innerHTML = "<h2>❌ Missing payment or appointment details.</h2>";
     } else {
-      const statusEl = document.getElementById('status');
-
-      // Function to check status repeatedly
-      async function checkStatus() {
-        try {
-          const res = await fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`);
-          const data = await res.json();
-
+      fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`)
+        .then(res => res.json())
+        .then(data => {
           if (data.code === "PAYMENT_SUCCESS") {
-            statusEl.innerText = "💜 Payment confirmed! Checking your appointment...";
+            document.getElementById('status').innerText = "💜 Payment confirmed! Redirecting to dashboard...";
 
-            // ✅ Check if webhook already created appointment
-            const apptRes = await fetch(`https://jainsewa-backend.onrender.com/api/appointments/by-txn?txnId=${txnId}`);
-            const apptData = await apptRes.json();
+            // ✅ Just redirect now, webhook handles appointment creation
+            sessionStorage.removeItem('pendingAppointment');
+            window.location.href = `patient-dashboard.html?success=1&txnId=${txnId}`;
 
-            if (apptData.success && apptData.appointmentId) {
-              sessionStorage.removeItem('pendingAppointment');
-              window.location.href = `patient-dashboard.html?success=1&appointmentId=${apptData.appointmentId}`;
-            } else {
-              // Keep polling until webhook processes it
-              setTimeout(checkStatus, 3000);
-            }
-          } else if (data.code === "PAYMENT_FAILED") {
-            document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
           } else {
-            // still pending → keep checking
-            setTimeout(checkStatus, 3000);
+            document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
           }
-        } catch (err) {
+        })
+        .catch(err => {
           console.error(err);
-          statusEl.innerText = "⚠️ Error checking payment status. Retrying...";
-          setTimeout(checkStatus, 3000);
-        }
-      }
-
-      // Start checking
-      checkStatus();
+          document.body.innerHTML = `<h2>⚠️ Error checking payment status.</h2>`;
+        });
     }
   </script>
 </body>
