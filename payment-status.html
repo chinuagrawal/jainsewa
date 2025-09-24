@@ -35,18 +35,6 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    @media (max-width: 480px) {
-      body {
-        padding: 20px 15px;
-      }
-      h2 {
-        font-size: 1.2rem;
-      }
-      .spinner {
-        width: 40px;
-        height: 40px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -57,34 +45,35 @@
     const urlParams = new URLSearchParams(window.location.search);
     const txnId = urlParams.get('txnId');
 
-    let appointment = null;
-    try {
-      appointment = JSON.parse(sessionStorage.getItem('pendingAppointment'));
-    } catch (e) {
-      appointment = null;
-    }
-
     if (!txnId) {
       document.body.innerHTML = "<h2>❌ Missing payment or appointment details.</h2>";
     } else {
-      fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`)
-        .then(res => res.json())
-        .then(data => {
+      const statusEl = document.getElementById('status');
+
+      async function checkStatus() {
+        try {
+          // 1. Check payment status
+          const res = await fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`);
+          const data = await res.json();
+
           if (data.code === "PAYMENT_SUCCESS") {
-            document.getElementById('status').innerText = "💜 Payment confirmed! Redirecting to dashboard...";
+            statusEl.innerText = "💜 Payment confirmed! Checking your appointment...";
 
-            // ✅ Just redirect now, webhook handles appointment creation
-            sessionStorage.removeItem('pendingAppointment');
-            window.location.href = `patient-dashboard.html?success=1&txnId=${txnId}`;
-
-          } else {
+              sessionStorage.removeItem('pendingAppointment');
+              window.location.href = `patient-dashboard.html?success=1&txnId=${txnId}`;
+            } 
+            else if (data.code === "PAYMENT_FAILED") {
             document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
-          }
-        })
-        .catch(err => {
+          } 
+        } catch (err) {
           console.error(err);
-          document.body.innerHTML = `<h2>⚠️ Error checking payment status.</h2>`;
-        });
+          statusEl.innerText = "⚠️ Error checking payment status. Retrying...";
+          setTimeout(checkStatus, 3000);
+        }
+      }
+
+      // Start polling
+      checkStatus();
     }
   </script>
 </body>
