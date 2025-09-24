@@ -1,19 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const Booking = require('../models/Booking'); // adjust path if needed
-const PendingBooking = require('../models/PendingBooking'); // adjust path if needed
-
+const Appointment = require('../models/Appointment'); // adjust path
+const PendingAppointment = require('../models/PendingAppointment'); // adjust path
 
 router.post('/phonepe/webhook', async (req, res) => {
   try {
-    console.log('📥 PhonePe Callback Received:', req.body);
+    console.log('📥 PhonePe Callback Received (Appointments):', req.body);
 
     const payload = req.body.payload;
-
-
     if (!payload) {
       console.error("❌ Invalid webhook format");
-      return res.status(200).send("OK");
+      return res.status(200).send("OK"); // ACK to PhonePe
     }
 
     const { merchantOrderId, state, paymentDetails, metaInfo } = payload;
@@ -21,58 +18,51 @@ router.post('/phonepe/webhook', async (req, res) => {
     if (state === "COMPLETED") {
       const phonepeTxn = paymentDetails?.[0]?.transactionId || null;
       const paymentMode = paymentDetails?.[0]?.paymentMode || "UNKNOWN";
-      const email = metaInfo?.udf1;
+      const email = metaInfo?.udf1 || null;
 
-      // 1️⃣ Check if booking already exists
-      const existing = await Booking.findOne({ paymentTxnId: merchantOrderId });
+      // 1️⃣ Check if appointment already exists
+      const existing = await Appointment.findOne({ paymentTxnId: merchantOrderId });
       if (!existing) {
-        // 2️⃣ Find Pending Booking
-        const pending = await PendingBooking.findOne({ txnId: merchantOrderId });
+        // 2️⃣ Find Pending Appointment
+        const pending = await PendingAppointment.findOne({ txnId: merchantOrderId });
         if (pending) {
-          // ✅ Generate all dates between startDate and endDate
-          const dates = [];
-          let current = new Date(pending.startDate);
-          const end = new Date(pending.endDate);
-          while (current <= end) {
-            dates.push(current.toISOString().split('T')[0]);
-            current.setDate(current.getDate() + 1);
-          }
-
-          // ✅ Create bookings for each date
-          const bookings = dates.map(date => ({
-            seatId: pending.seatId,
-            date,
-            shift: pending.shift,
-            email: pending.email,
-            amount: pending.amount,
-            status: "paid",
+          // ✅ Create confirmed appointment
+          const appointment = new Appointment({
+            appointmentId: 'APT_' + Date.now(),
+            userEmail: pending.email,
+            userMobile: pending.mobile,
+            doctor: pending.doctor || 'General',
+            date: pending.date,
+            notes: pending.notes || '',
+            fee: pending.amount,
+            status: 'confirmed',
             paymentMode,
-            paymentTxnId: merchantOrderId,  // your TXN_xxx
-            transactionId: phonepeTxn,      // PhonePe txn id
+            paymentTxnId: merchantOrderId,  // our txnId
+            transactionId: phonepeTxn,      // PhonePe’s txnId
             paymentConfirmedVia: "webhook"
-          }));
+          });
 
-          await Booking.insertMany(bookings);
-          await PendingBooking.deleteOne({ txnId: merchantOrderId });
-          console.log(`✅ Seats booked for ${email}, TXN: ${merchantOrderId}, Dates: ${dates.length}`);
+          await appointment.save();
+          await PendingAppointment.deleteOne({ _id: pending._id });
+
+          console.log(`✅ Appointment confirmed for ${email}, TXN: ${merchantOrderId}`);
         } else {
-          console.warn("⚠️ Pending booking not found for:", merchantOrderId);
+          console.warn("⚠️ Pending appointment not found for:", merchantOrderId);
         }
       } else {
-        console.log("ℹ️ Booking already exists, skipping duplicate:", merchantOrderId);
+        console.log("ℹ️ Appointment already exists, skipping duplicate:", merchantOrderId);
       }
     } else {
-      // ❌ Failed or expired payment → cleanup
-      await PendingBooking.deleteOne({ txnId: payload.merchantOrderId });
+      // ❌ Payment failed or expired → cleanup
+      await PendingAppointment.deleteOne({ txnId: payload.merchantOrderId });
       console.log(`❌ Payment failed/expired: ${payload.merchantOrderId}`);
     }
 
-    res.status(200).send("OK"); // Always ACK
+    res.status(200).send("OK"); // Always ACK to PhonePe
   } catch (err) {
-    console.error("Webhook error:", err);
+    console.error("❌ Webhook error (Appointments):", err);
     res.status(200).send("OK");
   }
 });
 
 module.exports = router;
-

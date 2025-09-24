@@ -390,57 +390,6 @@ app.get('/api/payment/status', async (req, res) => {
 
 
 
-app.post('/api/appointments/confirm', async (req, res) => {
-  try {
-    const { txnId } = req.body;
-
-    
-    
-
-    // 1. Find the pending appointment using txnId
-    const pending = await PendingAppointment.findOne({ txnId });
-    if (!pending) {
-      return res.status(404).json({
-        success: false,
-        message: 'Pending appointment not found'
-      });
-    }
-
-    // 2. Create a confirmed appointment
-    const appointment = new Appointment({
-      appointmentId: 'APT_' + Date.now(),
-      userEmail: pending.email,
-      userMobile: pending.mobile,
-      doctor: pending.doctor || 'General',
-      date: pending.date,
-      notes: pending.notes || '',
-      fee: pending.amount,
-      paymentTxnId: txnId,
-      
-      status: 'confirmed'
-    });
-
-    await appointment.save();
-
-    // 3. Remove from Pending
-    await PendingAppointment.deleteOne({ _id: pending._id });
-
-    res.json({
-      success: true,
-      appointmentId: appointment.appointmentId
-    });
-  } catch (err) {
-    console.error('❌ Error confirming appointment:', err);
-    res.status(500).json({
-      success: false,
-      message: 'Error confirming appointment'
-    });
-  }
-});
-
-// Get all appointments (Admin)
-
-
 
 
 
