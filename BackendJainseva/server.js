@@ -338,7 +338,7 @@ app.get('/api/payment/status', async (req, res) => {
   try {
     // ✅ Step 1: Get Access Token
     const tokenRes = await axios.post(
-      `${baseUrl}/apis/pg/v1/oauth/token`,
+      `${baseUrl}/apis/identity-manager/v1/oauth/token`,
       new URLSearchParams({
         client_id: process.env.PHONEPE_CLIENT_ID,
         client_secret: process.env.PHONEPE_CLIENT_SECRET,
