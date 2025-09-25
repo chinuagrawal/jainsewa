@@ -203,15 +203,15 @@ http://www.tooplate.com/view/2098-health
 
 
 <!-- MAKE AN APPOINTMENT -->
-<section id="appointment" class="no-animate" data-stellar-background-ratio="3">
-  <div class="container">
-    <div class="row">
+<section id="appointment" class="no-animate">
+  <div class="appointment-container">
+    <div class="appointment-row">
 
-      <div class="col-md-6 col-sm-6">
-        <img src="images/about.png" class="img-responsive" alt="">
+      <div class="form-image">
+        <img src="images/about.png" alt="About">
       </div>
 
-      <div class="col-md-6 col-sm-6">
+      <div class="form-wrapper">
         <!-- CONTACT FORM HERE -->
         <form id="appointment-form" role="form">
 
@@ -220,29 +220,29 @@ http://www.tooplate.com/view/2098-health
             <h2>Make an Appointment / पंजीकरण</h2>
           </div>
 
-          <div class="no-animate">
+          <div class="form-grid no-animate">
             
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="first-name">First Name / पहला नाम</label>
               <input type="text" class="form-control" id="first-name" required>
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="last-name">Last Name / अंतिम नाम</label>
               <input type="text" class="form-control" id="last-name" required>
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="email">Email (optional)</label>
               <input type="email" class="form-control" id="email">
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="dob">Date of Birth / जन्म तिथि</label>
               <input type="date" class="form-control" id="dob" required>
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="gender">Gender / लिंग</label>
               <select id="gender" class="form-control" required>
                 <option value="" disabled selected hidden>Select Gender</option>
@@ -252,28 +252,30 @@ http://www.tooplate.com/view/2098-health
               </select>
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="city">City / शहर</label>
               <input type="text" class="form-control" id="city" required>
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="state">State / राज्य</label>
               <input type="text" class="form-control" id="state" required>
             </div>
 
-            <div class="col-md-6 col-sm-6">
+            <div class="form-group-half">
               <label for="disease">Disease / बीमारी</label>
               <input type="text" class="form-control" id="disease" required>
             </div>
 
-            <div class="col-md-12 col-sm-12">
+            <div class="form-group-full">
               <label for="mobile">Mobile Number / मोबाइल नंबर</label>
               <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
             </div>
 
-            <div class="col-md-12 col-sm-12">
-              <button type="submit" class="form-control btn btn-primary" id="cf-submit">Book Appointment</button>
+            <div class="form-group-full">
+              <button type="submit" class="form-control btn btn-primary" id="cf-submit">
+                Book Appointment
+              </button>
             </div>
           </div>
         </form>
@@ -282,20 +284,86 @@ http://www.tooplate.com/view/2098-health
     </div>
   </div>
 </section>
+
 <style>
-  /* Disable animations/parallax issues */
+ /* Disable animations/parallax */
 .no-animate {
   animation: none !important;
   visibility: visible !important;
   opacity: 1 !important;
   transform: none !important;
 }
-
-/* Extra: make section stable on mobile */
 #appointment.no-animate {
   background-position: center !important;
   background-attachment: scroll !important;
 }
+
+/* Layout */
+.appointment-container {
+  width: 90%;
+  margin: 0 auto;
+}
+.appointment-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+.form-image {
+  flex: 1 1 40%;
+}
+.form-image img {
+  max-width: 100%;
+  border-radius: 10px;
+}
+.form-wrapper {
+  flex: 1 1 55%;
+}
+
+/* Grid for form fields */
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.form-group-half {
+  flex: 1 1 calc(50% - 20px);
+}
+.form-group-full {
+  flex: 1 1 100%;
+}
+
+/* Inputs */
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Button */
+.btn {
+  background: #4a148c;
+  color: white;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.btn:hover {
+  background: #6a1b9a;
+}
+
+/* Mobile fix */
+@media (max-width: 768px) {
+  .appointment-row {
+    flex-direction: column;
+  }
+  .form-group-half {
+    flex: 1 1 100%;
+  }
+}
+
 
 </style>
 
