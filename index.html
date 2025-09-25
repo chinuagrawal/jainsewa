@@ -21,11 +21,11 @@ http://www.tooplate.com/view/2098-health
 
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
-  <!--<link rel="stylesheet" href="css/animate.css">-->
+  <link rel="stylesheet" href="css/animate.css">
   <link rel="stylesheet" href="css/owl.carousel.css">
   <link rel="stylesheet" href="css/owl.theme.default.min.css">
   <link rel="stylesheet" href="css/img-slide.css">
- <!-- <link rel="stylesheet" href="css/testimonial.css">-->
+  <link rel="stylesheet" href="css/testimonial.css">
 
 
   <!-- MAIN CSS -->
@@ -35,7 +35,7 @@ http://www.tooplate.com/view/2098-health
 
 <body id="top" data-spy="scroll" data-target=".navbar-collapse" data-offset="50">
 
-  <!-- PRE LOADER -->
+  <!-- PRE LOADER 
   <section class="preloader">
     <div class="spinner">
 
@@ -43,7 +43,7 @@ http://www.tooplate.com/view/2098-health
 
     </div>
   </section>
-
+-->
 
   <!-- HEADER -->
   <header>
@@ -105,8 +105,6 @@ http://www.tooplate.com/view/2098-health
 
     </div>
   </section>
-
-
 
 
   <!-- HOME -->
@@ -201,175 +199,86 @@ http://www.tooplate.com/view/2098-health
   <div class="carousel-indicators" aria-hidden="false"></div>
 </div>
 
-
 <!-- MAKE AN APPOINTMENT -->
-<section id="appointment" class="no-animate">
-  <div class="appointment-wrapper">
+<section id="appointment" data-stellar-background-ratio="3">
+  <div class="container">
+    <div class="row">
 
-    <!-- Left Image -->
-    <div class="form-image">
-      <img src="images/about.png" alt="About">
+      <div class="col-md-6 col-sm-6">
+        <img src="images/about.png" class="img-responsive" alt="">
+      </div>
+
+      <div class="col-md-6 col-sm-6">
+        <!-- CONTACT FORM HERE -->
+        <form id="appointment-form" role="form">
+
+          <!-- SECTION TITLE -->
+          <div class="section-title wow fadeInUp" data-wow-delay="0.4s">
+            <h2>Make an Appointment / पंजीकरण</h2>
+          </div>
+
+          <div class="wow fadeInUp" data-wow-delay="0.8s">
+            
+            <div class="col-md-6 col-sm-6">
+              <label for="first-name">First Name / पहला नाम</label>
+              <input type="text" class="form-control" id="first-name" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="last-name">Last Name / अंतिम नाम</label>
+              <input type="text" class="form-control" id="last-name" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="email">Email (optional)</label>
+              <input type="email" class="form-control" id="email">
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="dob">Date of Birth / जन्म तिथि</label>
+              <input type="date" class="form-control" id="dob" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="gender">Gender / लिंग</label>
+              <select id="gender" class="form-control" required>
+                <option value="" disabled selected hidden>Select Gender</option>
+                <option value="male">Male (पुरुष)</option>
+                <option value="female">Female (महिला)</option>
+                <option value="other">Other (अन्य)</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="city">City / शहर</label>
+              <input type="text" class="form-control" id="city" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="state">State / राज्य</label>
+              <input type="text" class="form-control" id="state" required>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+              <label for="disease">Disease / बीमारी</label>
+              <input type="text" class="form-control" id="disease" required>
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+              <label for="mobile">Mobile Number / मोबाइल नंबर</label>
+              <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+              <button type="submit" class="form-control btn btn-primary" id="cf-submit">Book Appointment</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
     </div>
-
-    <!-- Right Form -->
-    <div class="form-box">
-      <form id="appointment-form" role="form">
-
-        <!-- Title -->
-        <div class="section-title no-animate">
-          <h2>Make an Appointment / पंजीकरण</h2>
-        </div>
-
-        <div class="form-grid no-animate">
-
-          <div class="form-group-half">
-            <label for="first-name">First Name / पहला नाम</label>
-            <input type="text" class="form-control" id="first-name" required>
-          </div>
-
-          <div class="form-group-half">
-            <label for="last-name">Last Name / अंतिम नाम</label>
-            <input type="text" class="form-control" id="last-name" required>
-          </div>
-
-          <div class="form-group-half">
-            <label for="email">Email (optional)</label>
-            <input type="email" class="form-control" id="email">
-          </div>
-
-          <div class="form-group-half">
-            <label for="dob">Date of Birth / जन्म तिथि</label>
-            <input type="date" class="form-control" id="dob" required>
-          </div>
-
-          <div class="form-group-half">
-            <label for="gender">Gender / लिंग</label>
-            <select id="gender" class="form-control" required>
-              <option value="" disabled selected hidden>Select Gender</option>
-              <option value="male">Male (पुरुष)</option>
-              <option value="female">Female (महिला)</option>
-              <option value="other">Other (अन्य)</option>
-            </select>
-          </div>
-
-          <div class="form-group-half">
-            <label for="city">City / शहर</label>
-            <input type="text" class="form-control" id="city" required>
-          </div>
-
-          <div class="form-group-half">
-            <label for="state">State / राज्य</label>
-            <input type="text" class="form-control" id="state" required>
-          </div>
-
-          <div class="form-group-half">
-            <label for="disease">Disease / बीमारी</label>
-            <input type="text" class="form-control" id="disease" required>
-          </div>
-
-          <div class="form-group-full">
-            <label for="mobile">Mobile Number / मोबाइल नंबर</label>
-            <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
-          </div>
-
-          <div class="form-group-full">
-            <button type="submit" class="btn" id="cf-submit">
-              Book Appointment
-            </button>
-          </div>
-
-        </div>
-      </form>
-    </div>
-
   </div>
 </section>
-
-
-<style>
- /* Remove animations/parallax issues */
-.no-animate {
-  animation: none !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: none !important;
-}
-#appointment.no-animate {
-  background-position: center !important;
-  background-attachment: scroll !important;
-}
-
-/* Layout */
-.appointment-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  width: 90%;
-  margin: 0 auto;
-  align-items: flex-start;
-}
-.form-image {
-  flex: 1 1 40%;
-}
-.form-image img {
-  max-width: 100%;
-  border-radius: 10px;
-}
-.form-box {
-  flex: 1 1 55%;
-}
-
-/* Grid for form fields */
-.form-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.form-group-half {
-  flex: 1 1 calc(50% - 20px);
-}
-.form-group-full {
-  flex: 1 1 100%;
-}
-
-/* Inputs */
-.form-control {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-  box-sizing: border-box;
-}
-
-/* Button */
-.btn {
-  background: #4a148c;
-  color: #fff;
-  padding: 14px;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 500;
-}
-.btn:hover {
-  background: #6a1b9a;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .appointment-wrapper {
-    flex-direction: column;
-  }
-  .form-group-half {
-    flex: 1 1 100%;
-  }
-}
-
-
-
-</style>
 
 <script>
 document.getElementById("appointment-form").addEventListener("submit", async function (e) {
@@ -737,15 +646,14 @@ document.getElementById("appointment-form").addEventListener("submit", async fun
   <script src="js/jquery.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/jquery.sticky.js"></script>
-  <!--
-  <script src="js/jquery.stellar.min.js"></script> 
-  <script src="js/wow.min.js"></script>-->
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/wow.min.js"></script>
   <script src="js/smoothscroll.js"></script>
   <script src="js/owl.carousel.min.js"></script>
   <script src="js/custom.js"></script>
   <script src="js/img-slide.js"></script>
   <script src="js/sidepanel.js"></script>
-  <!--<script src="js/testimonial.js"></script>-->
+  <script src="js/testimonial.js"></script>
 
 </body>
 
