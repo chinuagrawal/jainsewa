@@ -204,89 +204,90 @@ http://www.tooplate.com/view/2098-health
 
 <!-- MAKE AN APPOINTMENT -->
 <section id="appointment" class="no-animate">
-  <div class="appointment-container">
-    <div class="appointment-row">
+  <div class="appointment-wrapper">
 
-      <div class="form-image">
-        <img src="images/about.png" alt="About">
-      </div>
-
-      <div class="form-wrapper">
-        <!-- CONTACT FORM HERE -->
-        <form id="appointment-form" role="form">
-
-          <!-- SECTION TITLE -->
-          <div class="section-title no-animate">
-            <h2>Make an Appointment / पंजीकरण</h2>
-          </div>
-
-          <div class="form-grid no-animate">
-            
-            <div class="form-group-half">
-              <label for="first-name">First Name / पहला नाम</label>
-              <input type="text" class="form-control" id="first-name" required>
-            </div>
-
-            <div class="form-group-half">
-              <label for="last-name">Last Name / अंतिम नाम</label>
-              <input type="text" class="form-control" id="last-name" required>
-            </div>
-
-            <div class="form-group-half">
-              <label for="email">Email (optional)</label>
-              <input type="email" class="form-control" id="email">
-            </div>
-
-            <div class="form-group-half">
-              <label for="dob">Date of Birth / जन्म तिथि</label>
-              <input type="date" class="form-control" id="dob" required>
-            </div>
-
-            <div class="form-group-half">
-              <label for="gender">Gender / लिंग</label>
-              <select id="gender" class="form-control" required>
-                <option value="" disabled selected hidden>Select Gender</option>
-                <option value="male">Male (पुरुष)</option>
-                <option value="female">Female (महिला)</option>
-                <option value="other">Other (अन्य)</option>
-              </select>
-            </div>
-
-            <div class="form-group-half">
-              <label for="city">City / शहर</label>
-              <input type="text" class="form-control" id="city" required>
-            </div>
-
-            <div class="form-group-half">
-              <label for="state">State / राज्य</label>
-              <input type="text" class="form-control" id="state" required>
-            </div>
-
-            <div class="form-group-half">
-              <label for="disease">Disease / बीमारी</label>
-              <input type="text" class="form-control" id="disease" required>
-            </div>
-
-            <div class="form-group-full">
-              <label for="mobile">Mobile Number / मोबाइल नंबर</label>
-              <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
-            </div>
-
-            <div class="form-group-full">
-              <button type="submit" class="form-control btn btn-primary" id="cf-submit">
-                Book Appointment
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-
+    <!-- Left Image -->
+    <div class="form-image">
+      <img src="images/about.png" alt="About">
     </div>
+
+    <!-- Right Form -->
+    <div class="form-box">
+      <form id="appointment-form" role="form">
+
+        <!-- Title -->
+        <div class="section-title no-animate">
+          <h2>Make an Appointment / पंजीकरण</h2>
+        </div>
+
+        <div class="form-grid no-animate">
+
+          <div class="form-group-half">
+            <label for="first-name">First Name / पहला नाम</label>
+            <input type="text" class="form-control" id="first-name" required>
+          </div>
+
+          <div class="form-group-half">
+            <label for="last-name">Last Name / अंतिम नाम</label>
+            <input type="text" class="form-control" id="last-name" required>
+          </div>
+
+          <div class="form-group-half">
+            <label for="email">Email (optional)</label>
+            <input type="email" class="form-control" id="email">
+          </div>
+
+          <div class="form-group-half">
+            <label for="dob">Date of Birth / जन्म तिथि</label>
+            <input type="date" class="form-control" id="dob" required>
+          </div>
+
+          <div class="form-group-half">
+            <label for="gender">Gender / लिंग</label>
+            <select id="gender" class="form-control" required>
+              <option value="" disabled selected hidden>Select Gender</option>
+              <option value="male">Male (पुरुष)</option>
+              <option value="female">Female (महिला)</option>
+              <option value="other">Other (अन्य)</option>
+            </select>
+          </div>
+
+          <div class="form-group-half">
+            <label for="city">City / शहर</label>
+            <input type="text" class="form-control" id="city" required>
+          </div>
+
+          <div class="form-group-half">
+            <label for="state">State / राज्य</label>
+            <input type="text" class="form-control" id="state" required>
+          </div>
+
+          <div class="form-group-half">
+            <label for="disease">Disease / बीमारी</label>
+            <input type="text" class="form-control" id="disease" required>
+          </div>
+
+          <div class="form-group-full">
+            <label for="mobile">Mobile Number / मोबाइल नंबर</label>
+            <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
+          </div>
+
+          <div class="form-group-full">
+            <button type="submit" class="btn" id="cf-submit">
+              Book Appointment
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
   </div>
 </section>
 
+
 <style>
- /* Disable animations/parallax */
+ /* Remove animations/parallax issues */
 .no-animate {
   animation: none !important;
   visibility: visible !important;
@@ -299,14 +300,12 @@ http://www.tooplate.com/view/2098-health
 }
 
 /* Layout */
-.appointment-container {
-  width: 90%;
-  margin: 0 auto;
-}
-.appointment-row {
+.appointment-wrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 30px;
+  width: 90%;
+  margin: 0 auto;
   align-items: flex-start;
 }
 .form-image {
@@ -316,7 +315,7 @@ http://www.tooplate.com/view/2098-health
   max-width: 100%;
   border-radius: 10px;
 }
-.form-wrapper {
+.form-box {
   flex: 1 1 55%;
 }
 
@@ -336,33 +335,38 @@ http://www.tooplate.com/view/2098-health
 /* Inputs */
 .form-control {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
 }
 
 /* Button */
 .btn {
   background: #4a148c;
-  color: white;
-  padding: 12px;
+  color: #fff;
+  padding: 14px;
   border: none;
   cursor: pointer;
   border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
 }
 .btn:hover {
   background: #6a1b9a;
 }
 
-/* Mobile fix */
+/* Responsive */
 @media (max-width: 768px) {
-  .appointment-row {
+  .appointment-wrapper {
     flex-direction: column;
   }
   .form-group-half {
     flex: 1 1 100%;
   }
 }
+
 
 
 </style>
