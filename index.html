@@ -201,8 +201,9 @@ http://www.tooplate.com/view/2098-health
   <div class="carousel-indicators" aria-hidden="false"></div>
 </div>
 
+
 <!-- MAKE AN APPOINTMENT -->
-<section id="appointment" data-stellar-background-ratio="3">
+<section id="appointment" class="no-animate" data-stellar-background-ratio="3">
   <div class="container">
     <div class="row">
 
@@ -215,11 +216,11 @@ http://www.tooplate.com/view/2098-health
         <form id="appointment-form" role="form">
 
           <!-- SECTION TITLE -->
-          <div class="section-title wow fadeInUp" >
+          <div class="section-title no-animate">
             <h2>Make an Appointment / पंजीकरण</h2>
           </div>
 
-          <div class="wow fadeInUp">
+          <div class="no-animate">
             
             <div class="col-md-6 col-sm-6">
               <label for="first-name">First Name / पहला नाम</label>
@@ -281,6 +282,22 @@ http://www.tooplate.com/view/2098-health
     </div>
   </div>
 </section>
+<style>
+  /* Disable animations/parallax issues */
+.no-animate {
+  animation: none !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Extra: make section stable on mobile */
+#appointment.no-animate {
+  background-position: center !important;
+  background-attachment: scroll !important;
+}
+
+</style>
 
 <script>
 document.getElementById("appointment-form").addEventListener("submit", async function (e) {
