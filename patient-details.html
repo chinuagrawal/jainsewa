@@ -173,16 +173,46 @@
   </style>
 </head>
 <body>
+    <br><br>
   <div class="wrap">
-    <header class="top">
-      <a href="appointment.html" class="back-btn" aria-label="Back to appointments">
-        <!-- simple left arrow -->
-        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11.5 15L6.5 10L11.5 5" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="title"><h1>Patient Details</h1><div class="subtitle">Appointment & patient information</div></span>
-      </a>
-    </header>
+   <header class="top">
+  <button id="backBtn" class="back-btn" type="button" aria-label="Go back">
+    <!-- simple left arrow -->
+    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M11.5 15L6.5 10L11.5 5" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="title"><h1>Patient Details</h1><div class="subtitle">Appointment & patient information</div></span>
+  </button>
+</header>
+
+<script>
+  // Back button: use history.back() like phone back button.
+  // If there's no history (history.length <= 1), fall back to a safe URL.
+  (function () {
+    const backBtn = document.getElementById('backBtn');
+    const fallbackUrl = 'doctorPanel.html'; // change if needed
+
+    backBtn.addEventListener('click', (e) => {
+      // Prefer history.back() so browser/hardware back behaves the same
+      if (window.history && window.history.length > 1) {
+        window.history.back();
+      } else {
+        // fallback: open the default panel page
+        window.location.replace(fallbackUrl);
+      }
+    });
+
+    // Optional: handle keyboard "Backspace" (desktop) for convenience
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && (e.target === document.body || e.target.tagName === 'DIV')) {
+        e.preventDefault();
+        if (window.history && window.history.length > 1) window.history.back();
+        else window.location.replace(fallbackUrl);
+      }
+    });
+  })();
+</script>
+
 
     <main class="card" id="mainCard">
       <div id="loading" class="loader" aria-hidden="true"></div>
