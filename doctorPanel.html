@@ -272,7 +272,7 @@ document.querySelectorAll(".sidebar a").forEach(link => {
 
     function loadRecentBookings() {
       const iframe = document.createElement('iframe');
-      iframe.src = 'appointment.html?v=1.0.3';
+      iframe.src = 'appointment.html?v=1.0.4';
       const mainContent = document.getElementById('mainContent');
       mainContent.innerHTML = '';
       mainContent.appendChild(iframe);
@@ -280,7 +280,7 @@ document.querySelectorAll(".sidebar a").forEach(link => {
 
     function loadregisteredUsers() {
       const iframe = document.createElement('iframe');
-      iframe.src = 'registered-user.html';
+      iframe.src = 'registered-user.html?v=1.0.3';
       const mainContent = document.getElementById('mainContent');
       mainContent.innerHTML = '';
       mainContent.appendChild(iframe);
