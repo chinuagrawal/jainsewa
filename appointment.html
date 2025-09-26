@@ -80,7 +80,7 @@
         const url = `https://jainsewa-backend.onrender.com/api/admin/appointments${buildQuery()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch appointments");
-
+        
         let data = await res.json();
         data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -99,7 +99,11 @@
 
           row.innerHTML = `
             <td><input type="checkbox" ${appt.viewed ? "checked" : ""}></td>
-            <td>${appt.patientName || '-'}</td>
+            <td>
+  <a href="patient-details.html?id=${appt._id}">
+    ${appt.patientName || '-'}
+  </a>
+</td>
             <td>${appt.userMobile || '-'}</td>
             <td>${appt.patientEmail || appt.userEmail || '-'}</td>
             <td>${appt.doctor || '-'}</td>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Patient Details</title>
+
+  <!-- Optional: nice system font fallback + Google Inter for better readability (works if online) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent-start:#6ee7b7;
+      --accent-end:#60a5fa;
+      --accent-text:#0f172a;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 6px 20px rgba(16,24,40,0.08);
+      --radius: 12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+      color: #0b1220;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:18px;
+      line-height:1.4;
+    }
+
+    .wrap{
+      max-width:920px;
+      margin:0 auto;
+    }
+
+    header.top {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:10px;
+      background:var(--card);
+      border:1px solid rgba(15,23,42,0.06);
+      box-shadow: var(--shadow);
+      text-decoration:none;
+      color:var(--accent-text);
+      font-weight:600;
+      font-size:14px;
+    }
+    .title {
+      margin-left:6px;
+    }
+    h1{font-size:20px;margin:0}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+
+    /* Main card layout */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), var(--card));
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+      display:grid;
+      gap:12px;
+      align-items:start;
+    }
+
+    /* Responsive grid: left patient info, right appointment */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media(min-width:760px){
+      .grid{grid-template-columns: 360px 1fr}
+    }
+
+    /* Profile panel */
+    .profile {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .avatar {
+      width:84px;height:84px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,var(--accent-start),var(--accent-end));
+      color:var(--accent-text);
+      font-weight:700;font-size:22px;
+      box-shadow:0 6px 18px rgba(12,74,110,0.06);
+    }
+    .name{font-size:18px;font-weight:700;margin:0}
+    .meta{color:var(--muted);font-size:13px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .chip{
+      background: rgba(15,23,42,0.05);
+      padding:6px 8px;border-radius:999px;font-weight:600;font-size:13px;color:var(--muted)
+    }
+
+    /* contact area */
+    .contact-actions{display:flex;gap:8px;margin-top:8px}
+    .btn {
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 12px;border-radius:10px;border:0;
+      background:linear-gradient(90deg,var(--accent-start),var(--accent-end));
+      color:var(--accent-text);font-weight:700;font-size:14px;
+      cursor:pointer;box-shadow:0 6px 18px rgba(96,165,250,0.12);
+    }
+    .btn.secondary {
+      background:#fff;border:1px solid rgba(12,18,40,0.06);
+      color:var(--accent-text);
+      box-shadow:none;font-weight:600;
+    }
+
+    /* details list */
+    .info-list{display:flex;flex-direction:column;gap:8px}
+    .info-row{display:flex;justify-content:space-between;gap:12px;padding:8px;border-radius:8px;}
+    .info-row:nth-child(odd){background:rgba(15,23,42,0.02)}
+    .info-label{color:var(--muted);font-weight:600;font-size:13px}
+    .info-value{font-weight:600;text-align:right}
+
+    /* appointment panel */
+    .appt-panel{display:flex;flex-direction:column;gap:12px}
+    .section-title{display:flex;justify-content:space-between;align-items:center}
+    .h3{font-size:15px;font-weight:700;margin:0}
+    .small{color:var(--muted);font-size:13px}
+
+    .appt-card{
+      border-radius:10px;padding:12px;background:linear-gradient(180deg, #fff, rgba(250,250,255,0.95));
+      border:1px solid rgba(12,18,40,0.04);
+      box-shadow: 0 6px 18px rgba(12,18,40,0.04);
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .row{display:flex;justify-content:space-between;align-items:center}
+    .tag{font-size:13px;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.06);font-weight:700}
+
+    /* notes */
+    .notes{
+      white-space:pre-wrap;
+      background:linear-gradient(180deg, rgba(240,246,255,0.6), rgba(255,255,255,0.6));
+      padding:10px;border-radius:8px;border:1px dashed rgba(12,18,40,0.06);
+      color:#0b1220;
+    }
+
+    /* subtle loader */
+    .loader {
+      height:120px;border-radius:8px;
+      background: linear-gradient(90deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.02) 50%, rgba(0,0,0,0.03) 100%);
+      animation: shimmer 1.2s linear infinite;
+    }
+    @keyframes shimmer{
+      0%{background-position:-300px 0}
+      100%{background-position:300px 0}
+    }
+
+    /* footer small */
+    footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+    /* utility */
+    .muted{color:var(--muted)}
+    .copy-btn{background:transparent;border:0;color:var(--muted);font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a href="appointments.html" class="back-btn" aria-label="Back to appointments">
+        <!-- simple left arrow -->
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.5 15L6.5 10L11.5 5" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="title"><h1>Patient Details</h1><div class="subtitle">Appointment & patient information</div></span>
+      </a>
+    </header>
+
+    <main class="card" id="mainCard">
+      <div id="loading" class="loader" aria-hidden="true"></div>
+
+      <div id="content" style="display:none">
+        <div class="grid">
+          <!-- left: profile -->
+          <aside class="profile">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div class="avatar" id="avatar">--</div>
+              <div>
+                <div class="name" id="patientName">Patient Name</div>
+                <div class="meta" id="patientMini">—</div>
+              </div>
+            </div>
+
+            <div class="chips" id="chips">
+              <!-- chips like gender, dob, city -->
+            </div>
+
+            <div class="contact-actions" id="contactActions">
+              <!-- call / copy / email buttons -->
+            </div>
+
+            <div class="info-list" id="basicInfo">
+              <!-- dynamic rows -->
+            </div>
+          </aside>
+
+          <!-- right: appointment -->
+          <section class="appt-panel">
+            <div class="section-title">
+              <div><h3 class="h3">Appointment</h3><div class="small">Latest appointment details</div></div>
+              <div class="tag" id="statusTag">Status</div>
+            </div>
+
+            <div class="appt-card">
+              <div class="row">
+                <div class="muted">Doctor</div>
+                <div id="doctor" class="info-value">—</div>
+              </div>
+
+              <div class="row">
+                <div class="muted">Date</div>
+                <div id="date" class="info-value">—</div>
+              </div>
+
+              <div class="row">
+                <div class="muted">Fee</div>
+                <div id="fee" class="info-value">₹0</div>
+              </div>
+
+              <div class="row">
+                <div class="muted">Payment Txn</div>
+                <div id="txn" class="info-value small">—</div>
+              </div>
+
+              <div>
+                <div class="muted" style="margin-bottom:6px">Notes</div>
+                <div id="notes" class="notes">—</div>
+              </div>
+
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+                <button class="btn secondary" id="btnEdit" title="Edit (not implemented)">Edit</button>
+                <button class="btn" id="btnPrint">Print</button>
+              </div>
+            </div>
+
+            <div style="font-size:13px;color:var(--muted);margin-top:6px">
+              Created at: <span id="createdAt">—</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>Tip: tap the phone number to call or use the copy button to paste into your phone app</footer>
+  </div>
+
+  <script>
+    // utility to build info rows
+    function addInfoRow(container, label, value) {
+      const div = document.createElement('div');
+      div.className = 'info-row';
+      div.innerHTML = `<div class="info-label">${label}</div><div class="info-value">${value ?? '-'}</div>`;
+      container.appendChild(div);
+    }
+
+    // read id from URL and fetch
+    async function loadDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) {
+        document.getElementById('mainCard').innerHTML = '<div style="padding:20px">No appointment selected.</div>';
+        return;
+      }
+
+      // show loader
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+
+      try {
+        const res = await fetch(`https://jainsewa-backend.onrender.com/api/admin/appointments?id=${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        const appt = Array.isArray(data) ? data[0] : data;
+
+        if (!appt) {
+          document.getElementById('mainCard').innerHTML = '<div style="padding:20px">Patient not found.</div>';
+          return;
+        }
+
+        // build UI values (be defensive about field names)
+        const patientName = appt.patientName || `${(appt.user && (appt.user.firstName||appt.user.lastName)) ? (appt.user.firstName||'') + ' ' + (appt.user.lastName||'') : '-'}`;
+        const gender = appt.patientGender || appt.user?.gender || appt.gender || '-';
+        const dob = appt.patientDOB || appt.user?.dob || appt.dob || '-';
+        const city = appt.patientCity || appt.user?.city || appt.city || '-';
+        const state = appt.patientState || appt.user?.state || appt.state || '-';
+        const disease = appt.patientDisease || appt.user?.disease || appt.disease || '-';
+        const mobile = appt.userMobile || appt.user?.mobile || '-';
+        const email = appt.patientEmail || appt.user?.email || appt.userEmail || '-';
+
+        const doctor = appt.doctor || '-';
+        const date = appt.date ? (new Date(appt.date)).toLocaleString() : (appt.createdAt ? new Date(appt.createdAt).toLocaleString() : '-');
+        const fee = (appt.fee != null) ? `₹${appt.fee}` : '₹0';
+        const txn = appt.paymentTxn || appt.paymentTxnId || appt.paymentTxnId || '-';
+        const notes = appt.notes || '-';
+        const status = appt.status || '-';
+        const createdAt = appt.createdAt ? new Date(appt.createdAt).toLocaleString() : '-';
+
+        // fill header
+        document.getElementById('avatar').textContent = (patientName && patientName !== '-') ? patientName.split(' ').map(x => x[0]).slice(0,2).join('') : 'P';
+        document.getElementById('patientName').textContent = patientName;
+        document.getElementById('patientMini').textContent = `${gender !== '-' ? gender + ' • ' : ''}${dob !== '-' ? dob : ''}`;
+
+        // chips
+        const chips = document.getElementById('chips');
+        chips.innerHTML = '';
+        if (gender && gender !== '-') chips.appendChild(Object.assign(document.createElement('div'),{className:'chip',textContent:gender}));
+        if (dob && dob !== '-') chips.appendChild(Object.assign(document.createElement('div'),{className:'chip',textContent:dob}));
+        if (city && city !== '-' && state && state !== '-') chips.appendChild(Object.assign(document.createElement('div'),{className:'chip',textContent:`${city}, ${state}`}));
+        if (disease && disease !== '-') chips.appendChild(Object.assign(document.createElement('div'),{className:'chip',textContent:disease}));
+
+        // contact actions
+        const contactActions = document.getElementById('contactActions');
+        contactActions.innerHTML = '';
+        // call
+        const callBtn = document.createElement('a');
+        callBtn.className = 'btn';
+        callBtn.href = `tel:${mobile}`;
+        callBtn.innerHTML = '📞 Call';
+        contactActions.appendChild(callBtn);
+
+        // copy
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn secondary';
+        copyBtn.type = 'button';
+        copyBtn.innerHTML = '📋 Copy';
+        copyBtn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(mobile);
+            copyBtn.textContent = 'Copied';
+            setTimeout(()=> copyBtn.textContent = '📋 Copy', 1200);
+          } catch(e) {
+            alert('Copy failed');
+          }
+        });
+        contactActions.appendChild(copyBtn);
+
+        // email button (only if email present)
+        if (email && email !== '-') {
+          const mail = document.createElement('a');
+          mail.className = 'btn secondary';
+          mail.href = `mailto:${email}`;
+          mail.innerHTML = '✉️ Email';
+          contactActions.appendChild(mail);
+        }
+
+        // basic info rows
+        const basic = document.getElementById('basicInfo');
+        basic.innerHTML = '';
+        addInfoRow(basic, 'Mobile', `<a href="tel:${mobile}" style="text-decoration:none;color:inherit">${mobile}</a>`);
+        addInfoRow(basic, 'Email', email);
+        addInfoRow(basic, 'City', city);
+        addInfoRow(basic, 'State', state);
+        addInfoRow(basic, 'Disease', disease);
+
+        // appointment section
+        document.getElementById('doctor').textContent = doctor;
+        document.getElementById('date').textContent = date;
+        document.getElementById('fee').textContent = fee;
+        document.getElementById('txn').textContent = txn;
+        document.getElementById('notes').textContent = notes;
+        document.getElementById('statusTag').textContent = status.charAt(0).toUpperCase()+status.slice(1);
+        document.getElementById('createdAt').textContent = createdAt;
+
+        // hide loader show content
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+        // print action
+        document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+        // edit placeholder
+        document.getElementById('btnEdit').addEventListener('click', () => {
+          alert('Edit function not implemented. You can implement an edit form on the server and POST changes.');
+        });
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('mainCard').innerHTML = `<div style="padding:18px">Error loading details. ${err.message}</div>`;
+      }
+    }
+
+    loadDetails();
+  </script>
+</body>
+</html>

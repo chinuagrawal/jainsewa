@@ -419,10 +419,10 @@ fetch(`https://jainsewa-backend.onrender.com/api/appointments?mobile=${user.mobi
     container.innerHTML = '';
 
     // Determine consultation fee and label based on previous appointments
-    let baseFee = 1;
+    let baseFee = 59;
     let feeLabel = "Consultation Fee";
     if (list.length >= 1) { // patient already has 1 appointment
-      baseFee = 2;
+      baseFee = 48;
       feeLabel = "Reconsultation Fee";
     }
 

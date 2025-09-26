@@ -80,37 +80,43 @@ app.get('/api/admin/appointments', async (req, res) => {
     }
 
     const pipeline = [
-      { $match: match },
-      { $sort: { createdAt: -1 } },
-      { $skip: Number(skip) },
-      { $limit: Math.min(1000, Number(limit)) },
-      {
-        $lookup: {
-          from: 'users',              // ensure your users collection is named 'users'
-          localField: 'userMobile',   // appointment holds mobile here
-          foreignField: 'mobile',
-          as: 'user'
+  { $match: match },
+  { $sort: { createdAt: -1 } },
+  { $skip: Number(skip) },
+  { $limit: Math.min(1000, Number(limit)) },
+  {
+    $lookup: {
+      from: 'users',
+      localField: 'userMobile',
+      foreignField: 'mobile',
+      as: 'user'
+    }
+  },
+  { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+  {
+    $addFields: {
+      patientName: {
+        $trim: {
+          input: {
+            $concat: [
+              { $ifNull: ['$user.firstName', ''] },
+              ' ',
+              { $ifNull: ['$user.lastName', ''] }
+            ]
+          }
         }
       },
-      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
-      {
-        $addFields: {
-          patientName: {
-            $trim: {
-              input: {
-                $concat: [
-                  { $ifNull: ['$user.firstName', ''] },
-                  ' ',
-                  { $ifNull: ['$user.lastName', ''] }
-                ]
-              }
-            }
-          },
-          patientEmail: { $ifNull: ['$user.email', null] }
-        }
-      },
-      { $project: { user: 0 } } // remove embedded user doc
-    ];
+      patientEmail: { $ifNull: ['$user.email', null] },
+      patientGender: { $ifNull: ['$user.gender', null] },
+      patientDOB: { $ifNull: ['$user.dob', null] },
+      patientCity: { $ifNull: ['$user.city', null] },
+      patientState: { $ifNull: ['$user.state', null] },
+      patientDisease: { $ifNull: ['$user.disease', null] }
+    }
+  },
+  { $project: { user: 0 } }
+];
+
 
     const appointments = await Appointment.aggregate(pipeline);
     res.json(appointments);
