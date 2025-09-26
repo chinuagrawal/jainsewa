@@ -84,6 +84,13 @@
       color:#777;
       margin-top:4px;
     }
+    .testimonial-rating { /* Renamed from .testimonial-role */
+  font-size: 1rem;     /* Adjust size as needed */
+  color: #FFD700;      /* A gold color for the stars */
+  margin-top: 4px;
+  letter-spacing: 2px; /* Adds a little space between stars */
+}
+
 
     /* ----- Laptop/Desktop Styles ----- */
     @media (min-width: 768px){
