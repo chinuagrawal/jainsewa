@@ -272,7 +272,7 @@ document.querySelectorAll(".sidebar a").forEach(link => {
 
     function loadRecentBookings() {
       const iframe = document.createElement('iframe');
-      iframe.src = 'appointment.html';
+      iframe.src = 'appointment.html?v=1.0.3';
       const mainContent = document.getElementById('mainContent');
       mainContent.innerHTML = '';
       mainContent.appendChild(iframe);
