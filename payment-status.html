@@ -44,8 +44,13 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const txnId = urlParams.get('txnId');
-
-    if (!txnId) {
+    let appointment = null;
+    try {
+      appointment = JSON.parse(sessionStorage.getItem('pendingAppointment'));
+    } catch (e) {
+      appointment = null;
+    }
+    if (!txnId || !appointment) {
       document.body.innerHTML = "<h2>❌ Missing payment or appointment details.</h2>";
     } else {
       const statusEl = document.getElementById('status');
@@ -53,14 +58,16 @@
       async function checkStatus() {
         try {
           // 1. Check payment status
-          const res = await fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`);
+          const res = await fetch(`http://localhost:3000/api/payment/status?txnId=${txnId}`);
           const data = await res.json();
 
           if (data.code === "PAYMENT_SUCCESS") {
             statusEl.innerText = "💜 Payment confirmed! Checking your appointment...";
 
               sessionStorage.removeItem('pendingAppointment');
-              window.location.href = `patient-dashboard.html?success=1&txnId=${txnId}`;
+              const query = `?success=1&name=${appointment.name}&mob=${appointment.mobile}&txnId=${txnId}`;
+              window.location.href = `patient-dashboard.html${query}`;
+              
             } 
             else if (data.code === "PAYMENT_FAILED") {
             document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;

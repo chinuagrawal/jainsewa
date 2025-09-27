@@ -135,6 +135,119 @@
 
     /* tiny adjustments for touch */
     button, .pay-button, .confirm { -webkit-tap-highlight-color: rgba(0,0,0,0.05) }
+
+   
+/* --- Root Variables for easy customization --- */
+:root {
+    --modal-success-color: #28a745;
+    --modal-bg-color: #ffffff;
+    --modal-text-color: #4a4a4a;
+    --modal-shadow-color: rgba(0, 0, 0, 0.1);
+    --modal-overlay-color: rgba(10, 10, 10, 0.8);
+}
+
+/* --- 1. Modal Overlay --- */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal-overlay-color);
+    backdrop-filter: blur(4px); /* Frosty glass effect */
+    
+    /* Animation */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* --- Show the modal --- */
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- 2. Modal Content Box --- */
+.modal-content {
+    background: var(--modal-bg-color);
+    padding: 2rem 2.5rem;
+    width: 90%;
+    max-width: 420px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 var(--modal-shadow-color);
+    text-align: center;
+    
+    /* Animation: slide in from bottom */
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modal:not(.hidden) .modal-content {
+    transform: translateY(0);
+}
+
+/* --- 3. Success Icon (SVG Checkmark) --- */
+.modal-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background-color: #eaf6ec; /* Light green background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-icon svg {
+    width: 50px;
+    height: 50px;
+    stroke: var(--modal-success-color);
+    stroke-width: 3;
+}
+
+/* --- 4. Typography --- */
+.modal-content h2 {
+    color: var(--modal-success-color);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+}
+
+.modal-content p {
+    color: var(--modal-text-color);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- 5. Action Button --- */
+#close-modal {
+    background: var(--modal-success-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 50px; /* Pill shape */
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#close-modal:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: translateY(-2px);
+}
+
+#close-modal:focus {
+    outline: 2px solid #a3d9b1;
+    outline-offset: 2px;
+}
   </style>
 </head>
 <body>
@@ -275,6 +388,14 @@
     <button class="confirm" id="confirmPay">Proceed to Pay</button>
   </div>
 
+  <div id="confirmation-modal" class="modal hidden">
+  <div class="modal-content">
+    
+    <p id="confirmation-details"></p>
+    <button id="close-modal">OK</button>
+  </div>
+</div>
+
   <script>
     // --- initial
     const user = JSON.parse(localStorage.getItem('user'));
@@ -297,7 +418,7 @@
 
     // Fetch full user details
     // --- Fetch full user details (replace the old fetch)
-fetch(`https://jainsewa-backend.onrender.com/api/user?mobile=${encodeURIComponent(user.mobile)}`)
+fetch(`http://localhost:3000/api/user?mobile=${encodeURIComponent(user.mobile)}`)
   .then(r => {
     if (r.status === 400) throw new Error('Missing mobile on request');
     if (r.status === 404) return null; // user not found
@@ -368,7 +489,7 @@ fetch(`https://jainsewa-backend.onrender.com/api/user?mobile=${encodeURIComponen
       confirmPay.disabled = true;
 
       try {
-        const res = await fetch('https://jainsewa-backend.onrender.com/api/payment/initiate', {
+        const res = await fetch('http://localhost:3000/api/payment/initiate', {
           method:'POST',
           headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify({
@@ -409,7 +530,7 @@ fetch(`https://jainsewa-backend.onrender.com/api/user?mobile=${encodeURIComponen
 //
 
 // Fetch patient's existing appointments to determine fee and label
-fetch(`https://jainsewa-backend.onrender.com/api/appointments?mobile=${user.mobile}`)
+fetch(`http://localhost:3000/api/appointments?mobile=${user.mobile}`)
   .then(r => r.json())
   .then(list => {
     const container = document.getElementById('appts');
@@ -450,8 +571,51 @@ fetch(`https://jainsewa-backend.onrender.com/api/appointments?mobile=${user.mobi
     });
   })
   .catch(err => console.error(err));
+  // Check for success query param to show confirmation modal
+// ✅ Corrected Code
+document.addEventListener("DOMContentLoaded", () => {
+    // Check for URL parameters as soon as the page loads
+    const params = new URLSearchParams(window.location.search);
+    
+    if (params.get('success') === '1') {
+        const name = params.get('name');
+        const mob = params.get('mob');
+        const txnId = params.get('txnId');
+        
+        // If the parameters exist, show the modal
+        showConfirmationModal(name, mob, txnId);
 
+        // Optional: Clean the URL to avoid the modal reappearing on refresh
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+//confirmation model
+function showConfirmationModal(name, mob, txnId) {
+  const modal = document.getElementById('confirmation-modal');
+  const details = document.getElementById('confirmation-details');
+  const closeBtn = document.getElementById('close-modal');
 
+  details.innerHTML = `
+  <h2>✅ अपॉइंटमेंट कन्फर्म हो गया!</h2>
+  
+    प्रिय <strong>${name}</strong>,<br>
+    आपका अपॉइंटमेंट सफलतापूर्वक बुक हो गया है।<br><br>
+    
+    📞 मोबाइल नंबर: <strong>${mob}</strong><br>
+    💳 ट्रांज़ैक्शन आईडी: <strong>${txnId}</strong><br><br>
+    
+    👨‍⚕️ डॉक्टर आपसे शीघ्र ही संपर्क करेंगे।<br><br>
+    धन्यवाद, स्वस्थ रहें!
+  
+`;
+
+  modal.classList.remove('hidden');
+
+  closeBtn.onclick = () => {
+    modal.classList.add('hidden');
+    window.location.href = 'patient-dashboard.html'; // 🔁 Redirect and reload to show updated seat
+  };
+}
 
     // Quick actions
     document.getElementById('logoutBtn').addEventListener('click', ()=> {
