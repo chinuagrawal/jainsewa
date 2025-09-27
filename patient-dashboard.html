@@ -418,7 +418,7 @@
 
     // Fetch full user details
     // --- Fetch full user details (replace the old fetch)
-fetch(`http://localhost:3000/api/user?mobile=${encodeURIComponent(user.mobile)}`)
+fetch(`https://jainsewa-backend.onrender.com/api/user?mobile=${encodeURIComponent(user.mobile)}`)
   .then(r => {
     if (r.status === 400) throw new Error('Missing mobile on request');
     if (r.status === 404) return null; // user not found
@@ -489,7 +489,7 @@ fetch(`http://localhost:3000/api/user?mobile=${encodeURIComponent(user.mobile)}`
       confirmPay.disabled = true;
 
       try {
-        const res = await fetch('http://localhost:3000/api/payment/initiate', {
+        const res = await fetch('https://jainsewa-backend.onrender.com/api/payment/initiate', {
           method:'POST',
           headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify({
@@ -530,7 +530,7 @@ fetch(`http://localhost:3000/api/user?mobile=${encodeURIComponent(user.mobile)}`
 //
 
 // Fetch patient's existing appointments to determine fee and label
-fetch(`http://localhost:3000/api/appointments?mobile=${user.mobile}`)
+fetch(`https://jainsewa-backend.onrender.com/api/appointments?mobile=${user.mobile}`)
   .then(r => r.json())
   .then(list => {
     const container = document.getElementById('appts');

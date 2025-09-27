@@ -58,7 +58,7 @@
       async function checkStatus() {
         try {
           // 1. Check payment status
-          const res = await fetch(`http://localhost:3000/api/payment/status?txnId=${txnId}`);
+          const res = await fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`);
           const data = await res.json();
 
           if (data.code === "PAYMENT_SUCCESS") {
