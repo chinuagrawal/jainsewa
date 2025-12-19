@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName:  { type: String, required: true },
@@ -15,6 +16,15 @@ const userSchema = new mongoose.Schema({
   city:      { type: String },
   state:     { type: String },
   disease:   { type: String },
+
+familyMembers: [
+    {
+      name: String,
+      relation: String,
+      age: Number,
+      gender: String
+    }
+  ],
 
   // ✅ Admin custom pricing
   customPricing: {
