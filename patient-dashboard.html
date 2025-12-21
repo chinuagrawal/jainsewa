@@ -16,6 +16,7 @@
     />
 
     <style>
+      
       :root {
         --bg: #f4f6fb;
         --card: #ffffff;
@@ -586,6 +587,79 @@
         outline: 2px solid #a3d9b1;
         outline-offset: 2px;
       }
+      /* Book appointment row */
+.appointment-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 18px;
+  flex-wrap: wrap;
+}
+
+/* Label */
+.appointment-label {
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* Select dropdown */
+.appointment-select {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+/* Add Family Member button */
+.add-member-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 18px;
+  background: linear-gradient(135deg, #6a1b9a, #7b2cbf);
+  color: #fff;
+
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 6px 18px rgba(106, 27, 154, 0.35);
+  transition: all 0.25s ease;
+}
+
+/* + icon */
+.add-member-btn .add-icon {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Hover */
+.add-member-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(106, 27, 154, 0.45);
+}
+
+/* Mobile behavior */
+@media (max-width: 520px) {
+  .appointment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .appointment-select,
+  .add-member-btn {
+    width: 100%;
+  }
+}
+
     </style>
   </head>
   <body>
@@ -630,14 +704,19 @@
                 </p>
               </div>
             </div>
-            <label>Book appointment for:</label>
-            <select id="appointmentFor" name="appointmentFor">
-              <option value="self">Self</option>
-            </select>
-            <!-- add famil buttom -->
-            <button id="addMemberBtn" class="btn btn-primary">
-              ➕ Add Family Member
-            </button>
+<div class="appointment-row">
+  <label class="appointment-label">Book appointment for:</label>
+
+  <select id="appointmentFor" class="appointment-select">
+    <option value="self">Self</option>
+  </select>
+
+  <button id="addMemberBtn" class="add-member-btn">
+    <span class="add-icon">+</span>
+    Add Family Member
+  </button>
+</div>
+
 
             <div id="familyList"></div>
             <!-- personal details -->
@@ -934,7 +1013,7 @@
           };
 
           const res = await fetch(
-            "https://jainsewa-backend.onrender.com/api/payment/initiate",
+            "https://localhost:3000/api/payment/initiate",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -1096,11 +1175,7 @@
     </script>
     <script>
       function addFamilyToUI(member) {
-        // 1️⃣ Show member below dropdown
-        const div = document.createElement("div");
-        div.style.margin = "6px 0";
-        div.innerHTML = `<b>${member.name}</b> (${member.relation}) — Age: ${member.age}, Gender: ${member.gender}`;
-        familyList.appendChild(div);
+    
 
         // 2️⃣ Add member to dropdown (IMPORTANT)
         const opt = document.createElement("option");

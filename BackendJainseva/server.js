@@ -199,6 +199,49 @@ app.get('/api/user', async (req, res) => {
   }
 });
 
+// POST /api/user/family-member
+app.post('/api/user/family-member', async (req, res) => {
+  try {
+    const { mobile, name, relation, age, gender } = req.body;
+
+    if (!mobile || !name || !relation || !age || !gender) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const user = await User.findOne({ mobile });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // 🔒 Prevent duplicate family member
+    const exists = user.familyMembers.some(m =>
+      m.name === name &&
+      m.relation === relation &&
+      Number(m.age) === Number(age) &&
+      m.gender === gender
+    );
+
+    if (exists) {
+      return res.status(409).json({
+        message: 'Family member already exists'
+      });
+    }
+
+    user.familyMembers.push({ name, relation, age, gender });
+    await user.save();
+
+    res.json({
+      message: 'Family member added successfully',
+      familyMembers: user.familyMembers
+    });
+
+  } catch (err) {
+    console.error('Error adding family member:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 
 // GET /api/admin/users
