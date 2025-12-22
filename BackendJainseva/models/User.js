@@ -17,14 +17,31 @@ const userSchema = new mongoose.Schema({
   state:     { type: String },
   disease:   { type: String },
 
-familyMembers: [
+user = {
+  firstName,
+  lastName,
+  gender,
+  mobile,
+  city,
+  state,
+  disease,
+
+
+  familyMembers: [
     {
-      name: String,
-      relation: String,
-      age: Number,
-      gender: String
+      _id,
+      name,
+      relation,
+      age,
+      gender,
+      city,
+      state,
+      disease
     }
-  ],
+  ]
+}
+
+
 
   // ✅ Admin custom pricing
   customPricing: {

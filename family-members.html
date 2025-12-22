@@ -1,253 +1,260 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Manage Family Members</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* Page background */
-body {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #ede7f6, #e3f2fd);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-/* Main container card */
-.family-page {
-  width: 100%;
-  max-width: 900px;
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 32px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
-}
-
-/* Page title */
-.page-title {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 700;
-  color: #5b1fa6;
-  margin-bottom: 32px;
-}
-
-/* Form wrapper */
-.family-form {
-  max-width: 720px;
-  margin: 0 auto 36px;
-}
-
-/* Vertical input layout */
-.form-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-bottom: 26px;
-}
-
-/* Inputs & Select */
-.form-grid input,
-.form-grid select {
-  width: 100%;
-  padding: 16px 18px;
-  border-radius: 14px;
-  border: 1px solid #dcdcdc;
-  font-size: 15px;
-  background: #fafafa;
-  transition: all 0.25s ease;
-}
-
-/* Focus effect */
-.form-grid input:focus,
-.form-grid select:focus {
-  outline: none;
-  border-color: #6a1b9a;
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(106, 27, 154, 0.15);
-}
-
-/* Add Family Member button */
-.btn-primary {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, #6a1b9a, #4527a0);
-  color: #ffffff;
-  border: none;
-  border-radius: 16px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 10px 26px rgba(74, 20, 140, 0.35);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(74, 20, 140, 0.45);
-}
-
-/* Family list */
-.family-list {
-  max-width: 720px;
-  margin: 0 auto 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* Family member card */
-.family-list div {
-  background: linear-gradient(135deg, #f3e5f5, #ede7f6);
-  padding: 16px 18px;
-  border-radius: 16px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  border-left: 6px solid #6a1b9a;
-}
-
-/* Back button */
-.btn-secondary {
-  width: 100%;
-  padding: 15px;
-  border-radius: 16px;
-  border: 1px solid #ddd;
-  background: #ffffff;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: #f5f5f5;
-  transform: translateY(-1px);
-}
-
-/* Mobile fine-tuning */
-@media (max-width: 480px) {
-  .family-page {
-    padding: 24px 20px;
-    border-radius: 18px;
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  /* Page background */
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ede7f6, #e3f2fd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* Main container card */
+  .family-page {
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 32px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Page title */
   .page-title {
-    font-size: 22px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #5b1fa6;
+    margin-bottom: 32px;
+  }
+
+  /* Form wrapper */
+  .family-form {
+    max-width: 720px;
+    margin: 0 auto 36px;
+  }
+
+  /* Vertical input layout */
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
     margin-bottom: 26px;
   }
 
-  .btn-primary,
-  .btn-secondary {
-    font-size: 15px;
-  }
-  /* ===== LAPTOP ONLY (13–14 inch screens) ===== */
-@media (min-width: 1024px) and (max-width: 1366px) {
-
-  .family-page {
-    max-width: 760px;          /* smaller card */
-    padding: 24px;
-  }
-
-  .page-title {
-    font-size: 22px;
-    margin-bottom: 24px;
-  }
-
-  .family-form {
-    max-width: 640px;
-  }
-
+  /* Inputs & Select */
   .form-grid input,
   .form-grid select {
-    padding: 14px 16px;
-    font-size: 14px;
-  }
-
-  .btn-primary,
-  .btn-secondary {
-    padding: 13px;
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid #dcdcdc;
     font-size: 15px;
+    background: #fafafa;
+    transition: all 0.25s ease;
   }
 
+  /* Focus effect */
+  .form-grid input:focus,
+  .form-grid select:focus {
+    outline: none;
+    border-color: #6a1b9a;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(106, 27, 154, 0.15);
+  }
+
+  /* Add Family Member button */
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #6a1b9a, #4527a0);
+    color: #ffffff;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 10px 26px rgba(74, 20, 140, 0.35);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(74, 20, 140, 0.45);
+  }
+
+  /* Family list */
+  .family-list {
+    max-width: 720px;
+    margin: 0 auto 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Family member card */
   .family-list div {
-    padding: 14px 16px;
-    font-size: 14px;
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    padding: 16px 18px;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    border-left: 6px solid #6a1b9a;
   }
-  /* Fix relation dropdown size */
-#familyRelation {
-  max-height: 48px; /* closed height */
-}
 
-/* Dropdown options */
-#familyRelation option {
-  padding: 12px;
-  font-size: 14px;
-}
+  /* Back button */
+  .btn-secondary {
+    width: 100%;
+    padding: 15px;
+    border-radius: 16px;
+    border: 1px solid #ddd;
+    background: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
 
-/* Limit dropdown open height */
-#familyRelation {
-  overflow-y: auto;
-}
+  .btn-secondary:hover {
+    background: #f5f5f5;
+    transform: translateY(-1px);
+  }
 
-/* Webkit browsers (Chrome, Edge) */
-#familyRelation::-webkit-scrollbar {
-  width: 6px;
-}
+  /* Mobile fine-tuning */
+  @media (max-width: 480px) {
+    .family-page {
+      padding: 24px 20px;
+      border-radius: 18px;
+    }
 
-#familyRelation::-webkit-scrollbar-thumb {
-  background-color: #6a1b9a;
-  border-radius: 10px;
-}
+    .page-title {
+      font-size: 22px;
+      margin-bottom: 26px;
+    }
 
-#familyRelation::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-/* Fix relation dropdown size */
-#familyRelation {
-  max-height: 48px; /* closed height */
-}
+    .btn-primary,
+    .btn-secondary {
+      font-size: 15px;
+    }
 
-/* Dropdown options */
-#familyRelation option {
-  padding: 12px;
-  font-size: 14px;
-}
+    /* ===== LAPTOP ONLY (13–14 inch screens) ===== */
+    @media (min-width: 1024px) and (max-width: 1366px) {
 
-/* Limit dropdown open height */
-#familyRelation {
-  overflow-y: auto;
-}
+      .family-page {
+        max-width: 760px;
+        /* smaller card */
+        padding: 24px;
+      }
 
-/* Webkit browsers (Chrome, Edge) */
-#familyRelation::-webkit-scrollbar {
-  width: 6px;
-}
+      .page-title {
+        font-size: 22px;
+        margin-bottom: 24px;
+      }
 
-#familyRelation::-webkit-scrollbar-thumb {
-  background-color: #6a1b9a;
-  border-radius: 10px;
-}
+      .family-form {
+        max-width: 640px;
+      }
 
-#familyRelation::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
+      .form-grid input,
+      .form-grid select {
+        padding: 14px 16px;
+        font-size: 14px;
+      }
 
-}
+      .btn-primary,
+      .btn-secondary {
+        padding: 13px;
+        font-size: 15px;
+      }
 
-}
+      .family-list div {
+        padding: 14px 16px;
+        font-size: 14px;
+      }
+
+      /* Fix relation dropdown size */
+      #familyRelation {
+        max-height: 48px;
+        /* closed height */
+      }
+
+      /* Dropdown options */
+      #familyRelation option {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      /* Limit dropdown open height */
+      #familyRelation {
+        overflow-y: auto;
+      }
+
+      /* Webkit browsers (Chrome, Edge) */
+      #familyRelation::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #familyRelation::-webkit-scrollbar-thumb {
+        background-color: #6a1b9a;
+        border-radius: 10px;
+      }
+
+      #familyRelation::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      /* Fix relation dropdown size */
+      #familyRelation {
+        max-height: 48px;
+        /* closed height */
+      }
+
+      /* Dropdown options */
+      #familyRelation option {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      /* Limit dropdown open height */
+      #familyRelation {
+        overflow-y: auto;
+      }
+
+      /* Webkit browsers (Chrome, Edge) */
+      #familyRelation::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #familyRelation::-webkit-scrollbar-thumb {
+        background-color: #6a1b9a;
+        border-radius: 10px;
+      }
+
+      #familyRelation::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+    }
+
+  }
 </style>
+
 <body>
   <div class="family-page">
     <h2 class="page-title">Family Members</h2>
@@ -257,22 +264,22 @@ body {
         <input type="text" id="familyName" placeholder="Full Name" required />
         <select id="familyRelation" size="1" required>
 
-  <option value="">Select Relation</option>
-  <option>Father</option>
-  <option>Mother</option>
-  <option>Brother</option>
-  <option>Sister</option>
-  <option>Son</option>
-  <option>Daughter</option>
-  <option>Husband</option>
-  <option>Wife</option>
-  <option>Grandfather</option>
-  <option>Grandmother</option>
-  <option>Uncle</option>
-  <option>Aunt</option>
-  <option>Cousin</option>
-  <option>Other</option>
-</select>
+          <option value="">Select Relation</option>
+          <option>Father</option>
+          <option>Mother</option>
+          <option>Brother</option>
+          <option>Sister</option>
+          <option>Son</option>
+          <option>Daughter</option>
+          <option>Husband</option>
+          <option>Wife</option>
+          <option>Grandfather</option>
+          <option>Grandmother</option>
+          <option>Uncle</option>
+          <option>Aunt</option>
+          <option>Cousin</option>
+          <option>Other</option>
+        </select>
 
         <input type="number" id="familyAge" placeholder="Age" required />
         <select id="familyGender" required>
@@ -280,7 +287,12 @@ body {
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
+        <input type="date" id="familyDob" />
+        <input type="text" id="familyCity" placeholder="City" />
+        <input type="text" id="familyState" placeholder="State" />
+        <input type="text" id="familyDisease" placeholder="Disease" />
       </div>
+
 
       <button type="submit" class="btn-primary">Add Family Member</button>
     </form>
@@ -320,9 +332,7 @@ body {
 
       try {
         const res = await fetch(
-          "https://jainsewa-backend.onrender.com/api/user/family-member"
-` 
-          ,
+          "http://localhost:3000/api/user/family-member",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -332,7 +342,12 @@ body {
               relation,
               age,
               gender,
-            }),
+              city,
+              state,
+              disease
+            })
+
+
           }
         );
 
@@ -372,4 +387,5 @@ body {
   </script>
   <!-- JS stays SAME -->
 </body>
+
 </html>
