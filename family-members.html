@@ -1,215 +1,375 @@
+
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Manage Family Members</title>
-  </head>
-  <style>
-    /* Page container */
-    .family-page {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 24px;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-      font-family: Inter, system-ui, sans-serif;
-    }
+<html lang="en">
+<head>
+  <title>Manage Family Members</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-    /* Title */
-    .page-title {
-      margin-bottom: 20px;
-      font-size: 22px;
-      font-weight: 700;
-      color: #4a148c;
-    }
+/* Page background */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ede7f6, #e3f2fd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
 
-    /* Form */
-    .family-form {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
+/* Main container card */
+.family-page {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+}
 
-    /* Grid for inputs */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
+/* Page title */
+.page-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: #5b1fa6;
+  margin-bottom: 32px;
+}
 
-    /* Inputs */
-    .form-grid input,
-    .form-grid select {
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-      transition: border 0.2s, box-shadow 0.2s;
-    }
+/* Form wrapper */
+.family-form {
+  max-width: 720px;
+  margin: 0 auto 36px;
+}
 
-    .form-grid input:focus,
-    .form-grid select:focus {
-      outline: none;
-      border-color: #6a1b9a;
-      box-shadow: 0 0 0 3px rgba(106, 27, 154, 0.12);
-    }
+/* Vertical input layout */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 26px;
+}
 
-    /* Primary button */
-    .btn-primary {
-      align-self: flex-start;
-      padding: 10px 18px;
-      background: linear-gradient(135deg, #4a148c, #6a1b9a);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(74, 20, 140, 0.25);
-    }
+/* Inputs & Select */
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid #dcdcdc;
+  font-size: 15px;
+  background: #fafafa;
+  transition: all 0.25s ease;
+}
 
-    .btn-primary:hover {
-      opacity: 0.95;
-    }
+/* Focus effect */
+.form-grid input:focus,
+.form-grid select:focus {
+  outline: none;
+  border-color: #6a1b9a;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(106, 27, 154, 0.15);
+}
 
-    /* Family list */
-    .family-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+/* Add Family Member button */
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #6a1b9a, #4527a0);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 10px 26px rgba(74, 20, 140, 0.35);
+}
 
-    /* Member card */
-    .family-list div {
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: #f7f8fc;
-      font-size: 14px;
-      border-left: 4px solid #6a1b9a;
-    }
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(74, 20, 140, 0.45);
+}
 
-    /* Back button */
-    .btn-secondary {
-      padding: 8px 14px;
-      background: transparent;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-    }
+/* Family list */
+.family-list {
+  max-width: 720px;
+  margin: 0 auto 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-    .btn-secondary:hover {
-      background: #f2f2f2;
-    }
+/* Family member card */
+.family-list div {
+  background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+  padding: 16px 18px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  border-left: 6px solid #6a1b9a;
+}
 
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
+/* Back button */
+.btn-secondary {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid #ddd;
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-    @media (max-width: 480px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
+.btn-secondary:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
+}
 
-      .btn-primary {
-        width: 100%;
-      }
-    }
-  </style>
-  <body>
+/* Mobile fine-tuning */
+@media (max-width: 480px) {
+  .family-page {
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+
+  .page-title {
+    font-size: 22px;
+    margin-bottom: 26px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 15px;
+  }
+  /* ===== LAPTOP ONLY (13–14 inch screens) ===== */
+@media (min-width: 1024px) and (max-width: 1366px) {
+
+  .family-page {
+    max-width: 760px;          /* smaller card */
+    padding: 24px;
+  }
+
+  .page-title {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .family-form {
+    max-width: 640px;
+  }
+
+  .form-grid input,
+  .form-grid select {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 13px;
+    font-size: 15px;
+  }
+
+  .family-list div {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  /* Fix relation dropdown size */
+#familyRelation {
+  max-height: 48px; /* closed height */
+}
+
+/* Dropdown options */
+#familyRelation option {
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* Limit dropdown open height */
+#familyRelation {
+  overflow-y: auto;
+}
+
+/* Webkit browsers (Chrome, Edge) */
+#familyRelation::-webkit-scrollbar {
+  width: 6px;
+}
+
+#familyRelation::-webkit-scrollbar-thumb {
+  background-color: #6a1b9a;
+  border-radius: 10px;
+}
+
+#familyRelation::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+/* Fix relation dropdown size */
+#familyRelation {
+  max-height: 48px; /* closed height */
+}
+
+/* Dropdown options */
+#familyRelation option {
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* Limit dropdown open height */
+#familyRelation {
+  overflow-y: auto;
+}
+
+/* Webkit browsers (Chrome, Edge) */
+#familyRelation::-webkit-scrollbar {
+  width: 6px;
+}
+
+#familyRelation::-webkit-scrollbar-thumb {
+  background-color: #6a1b9a;
+  border-radius: 10px;
+}
+
+#familyRelation::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+}
+
+}
+</style>
+<body>
   <div class="family-page">
-  <h2 class="page-title">👨‍👩‍👧 Family Members</h2>
+    <h2 class="page-title">Family Members</h2>
 
-  <form id="familyForm" class="family-form">
-    <div class="form-grid">
-      <input type="text" id="familyName" placeholder="Full Name" required />
-      <input type="text" id="familyRelation" placeholder="Relation" required />
-      <input type="number" id="familyAge" placeholder="Age" required />
-      <select id="familyGender" required>
-        <option value="">Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-    </div>
+    <form id="familyForm" class="family-form">
+      <div class="form-grid">
+        <input type="text" id="familyName" placeholder="Full Name" required />
+        <select id="familyRelation" size="1" required>
 
-    <button type="submit" class="btn-primary">➕ Add Member</button>
-  </form>
+  <option value="">Select Relation</option>
+  <option>Father</option>
+  <option>Mother</option>
+  <option>Brother</option>
+  <option>Sister</option>
+  <option>Son</option>
+  <option>Daughter</option>
+  <option>Husband</option>
+  <option>Wife</option>
+  <option>Grandfather</option>
+  <option>Grandmother</option>
+  <option>Uncle</option>
+  <option>Aunt</option>
+  <option>Cousin</option>
+  <option>Other</option>
+</select>
 
-  <div id="familyList" class="family-list"></div>
+        <input type="number" id="familyAge" placeholder="Age" required />
+        <select id="familyGender" required>
+          <option value="">Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
 
-  <button class="btn-secondary" onclick="goBack()">← Back to Dashboard</button>
-</div>
+      <button type="submit" class="btn-primary">Add Family Member</button>
+    </form>
 
+    <div id="familyList" class="family-list"></div>
 
-    <script>
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user) {
-        alert("Please login first");
-        window.location.href = "login.html";
+    <button class="btn-secondary" onclick="goBack()">Back to Dashboard</button>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("Please login first");
+      window.location.href = "login.html";
+    }
+
+    const mobile = user.mobile;
+    const familyList = document.getElementById("familyList");
+
+    function goBack() {
+      window.location.href = "patient-dashboard.html";
+    }
+
+    // ✅ HANDLE ADD FAMILY MEMBER
+    familyForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("familyName").value.trim();
+      const relation = document.getElementById("familyRelation").value.trim();
+      const age = Number(document.getElementById("familyAge").value);
+      const gender = document.getElementById("familyGender").value;
+
+      if (!name || !relation || !age || !gender) {
+        alert("Please fill all fields");
+        return;
       }
 
-      const mobile = user.mobile;
-      const familyList = document.getElementById("familyList");
+      try {
+        const res = await fetch(
+          "https://jainsewa-backend.onrender.com/api/user/family-member"
+` 
+          ,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mobile,
+              name,
+              relation,
+              age,
+              gender,
+            }),
+          }
+        );
 
-      function goBack() {
-        window.location.href = "patient-dashboard.html";
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Added Successfully',
+          text: 'Family member has been added!',
+          timer: 2000,
+          showConfirmButton: false
+        });
+
+        // Optional: show added member on this page
+        // const div = document.createElement("div");
+        // div.textContent = `${name} (${relation}) - ${age}, ${gender}`;
+        // familyList.appendChild(div);
+
+        familyForm.reset();
+
+        // ✅ Redirect back so dashboard reloads fresh data
+        setTimeout(() => {
+          window.location.href = "patient-dashboard.html";
+        }, 500);
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: err.message,
+        });
+
       }
 
-      // ✅ HANDLE ADD FAMILY MEMBER
-      familyForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const name = document.getElementById("familyName").value.trim();
-        const relation = document.getElementById("familyRelation").value.trim();
-        const age = Number(document.getElementById("familyAge").value);
-        const gender = document.getElementById("familyGender").value;
-
-        if (!name || !relation || !age || !gender) {
-          alert("Please fill all fields");
-          return;
-        }
-
-        try {
-          const res = await fetch(
-            "https://jainsewa-backend.onrender.com/api/add-family-member",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                mobile,
-                name,
-                relation,
-                age,
-                gender,
-              }),
-            }
-          );
-
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message);
-
-          alert("✅ Family member added successfully");
-
-          // Optional: show added member on this page
-          const div = document.createElement("div");
-          div.textContent = `${name} (${relation}) - ${age}, ${gender}`;
-          familyList.appendChild(div);
-
-          familyForm.reset();
-
-          // ✅ Redirect back so dashboard reloads fresh data
-          setTimeout(() => {
-            window.location.href = "patient-dashboard.html";
-          }, 500);
-        } catch (err) {
-          console.error(err);
-          alert("❌ Failed to add family member");
-        }
-      });
-    </script>
-  </body>
+    });
+  </script>
+  <!-- JS stays SAME -->
+</body>
 </html>
