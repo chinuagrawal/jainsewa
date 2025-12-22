@@ -297,7 +297,7 @@ document.getElementById("appointment-form").addEventListener("submit", async fun
   const password = dob; // same trick as signup
 
   try {
-    const res = await fetch("https://localhost:3000/api/signup", {
+    const res = await fetch("https://jainsewa-backend.onrender.com/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ firstName, lastName, email, dob, gender, city, state, disease, mobile, password })
