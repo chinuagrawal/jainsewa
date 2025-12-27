@@ -290,7 +290,7 @@ app.put('/api/admin/appointments/:id/viewed', async (req, res) => {
 
 // Utility function: get PhonePe Access Token
 const getPhonePeAccessToken = async () => {
-  const baseUrl = 'https://api.phonepe.com/apis/identity-manager';
+  const baseUrl = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
   const clientId = process.env.PHONEPE_CLIENT_ID;
   const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
 
@@ -351,7 +351,7 @@ app.post('/api/payment/initiate', async (req, res) => {
 
     // ✅ Call PhonePe Initiate API
     const response = await axios.post(
-      `${baseUrl}/apis/pg/checkout/v2/pay`,
+      `${baseUrl}/apis/pg-sandbox/checkout/v2/pay`,
       payload,
       {
         headers: {
@@ -387,7 +387,7 @@ app.get('/api/payment/status', async (req, res) => {
   try {
     // ✅ Step 1: Get Access Token
     const tokenRes = await axios.post(
-      `${baseUrl}/apis/identity-manager/v1/oauth/token`,
+      `${baseUrl}/apis/pg-sandbox/v1/oauth/token`,
       new URLSearchParams({
         client_id: process.env.PHONEPE_CLIENT_ID,
         client_secret: process.env.PHONEPE_CLIENT_SECRET,
@@ -403,7 +403,7 @@ app.get('/api/payment/status', async (req, res) => {
 
     // ✅ Step 2: Check order status
     const statusRes = await axios.get(
-      `${baseUrl}/apis/pg/checkout/v2/order/${txnId}/status?details=false`,
+      `${baseUrl}/apis/pg-sandbox/checkout/v2/order/${txnId}/status?details=false`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -450,8 +450,40 @@ app.post('/api/payment/callback', (req, res) => {
 });
 
 
+// ✅ Add family member to user's account
+app.post('/api/add-family-member', async (req, res) => {
+  try {
+    const { mobile, name, relation, age, gender } = req.body;
+
+    if (!mobile || !name || !relation)
+      return res.status(400).json({ message: "Missing required fields" });
+
+    const user = await User.findOne({ mobile });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Add to array
+    user.familyMembers.push({ name, relation, age, gender });
+    await user.save();
+
+    res.json({ message: "Family member added", familyMembers: user.familyMembers });
+  } catch (err) {
+    console.error("Error adding family member:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
+app.get('/api/family/:mobile', async (req, res) => {
+  try {
+    const user = await User.findOne({ mobile: req.params.mobile });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json(user.familyMembers || []);
+  } catch (err) {
+    console.error('Error fetching family members:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 // Endpoint: Pending cash bookings summary
