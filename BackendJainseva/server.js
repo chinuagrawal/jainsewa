@@ -202,9 +202,16 @@ app.get('/api/user', async (req, res) => {
 // POST /api/user/family-member
 app.post('/api/user/family-member', async (req, res) => {
   try {
-    const { mobile, name, relation, age, gender } = req.body;
+    const {   mobile,
+  name,
+  relation,
+  age,
+  gender,
+  city,
+  state,
+  disease} = req.body;
 
-    if (!mobile || !name || !relation || !age || !gender) {
+    if (!mobile || !name || !relation || !age || !gender|| !city|| !state|| !disease) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -227,7 +234,13 @@ app.post('/api/user/family-member', async (req, res) => {
       });
     }
 
-    user.familyMembers.push({ name, relation, age, gender });
+    user.familyMembers.push({   name,
+  relation,
+  age,
+  gender,
+  city: city || "",
+  state: state || "",
+  disease: disease || ""});
     await user.save();
 
     res.json({

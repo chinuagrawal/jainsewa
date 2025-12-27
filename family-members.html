@@ -324,6 +324,9 @@
       const relation = document.getElementById("familyRelation").value.trim();
       const age = Number(document.getElementById("familyAge").value);
       const gender = document.getElementById("familyGender").value;
+      const city = document.getElementById("familyCity").value.trim();
+      const state = document.getElementById("familyState").value.trim();
+      const disease = document.getElementById("familyDisease").value.trim();
 
       if (!name || !relation || !age || !gender) {
         alert("Please fill all fields");
