@@ -303,7 +303,8 @@ app.put('/api/admin/appointments/:id/viewed', async (req, res) => {
 
 // Utility function: get PhonePe Access Token
 const getPhonePeAccessToken = async () => {
-  const baseUrl = 'https://api-preprod.phonepe.com/apis/identify-manager';
+ const baseUrl = 'https://api.phonepe.com/apis/hermes';
+
   const clientId = process.env.PHONEPE_CLIENT_ID;
   const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
 
@@ -364,7 +365,7 @@ app.post('/api/payment/initiate', async (req, res) => {
 
     // ✅ Call PhonePe Initiate API
     const response = await axios.post(
-      `${baseUrl}/apis/pg-sandbox/checkout/v2/pay`,
+      `${baseUrl}/checkout/v2/pay`,
       payload,
       {
         headers: {
@@ -416,7 +417,7 @@ app.get('/api/payment/status', async (req, res) => {
 
     // ✅ Step 2: Check order status
     const statusRes = await axios.get(
-      `${baseUrl}/apis/pg-sandbox/checkout/v2/order/${txnId}/status?details=false`,
+      `${baseUrl}/checkout/v2/order/${txnId}/status?details=false`,
       {
         headers: {
           'Content-Type': 'application/json',
