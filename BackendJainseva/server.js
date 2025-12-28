@@ -303,7 +303,7 @@ app.put('/api/admin/appointments/:id/viewed', async (req, res) => {
 
 // Utility function: get PhonePe Access Token
 const getPhonePeAccessToken = async () => {
-  const baseUrl = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
+  const baseUrl = 'https://api-preprod.phonepe.com/apis/identify-manager';
   const clientId = process.env.PHONEPE_CLIENT_ID;
   const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
 
@@ -420,7 +420,7 @@ app.get('/api/payment/status', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `O-Bearer ${accessToken}`
+          'Authorization': `Bearer ${accessToken}`
         }
       }
     );
