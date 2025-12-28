@@ -1,67 +1,85 @@
 const express = require('express');
 const router = express.Router();
-const Appointment = require('../models/Appointment'); // adjust path
-const PendingAppointment = require('../models/PendingAppointment'); // adjust path
+const Appointment = require('../models/Appointment');
+const PendingAppointment = require('../models/PendingAppointment');
+const User = require('../models/User');
 
 router.post('/phonepe/webhook', async (req, res) => {
   try {
-    console.log('📥 PhonePe Callback Received (Appointments):', req.body);
+    console.log('📥 PhonePe Callback Received:', JSON.stringify(req.body, null, 2));
 
     const payload = req.body.payload;
     if (!payload) {
-      console.error("❌ Invalid webhook format");
-      return res.status(200).send("OK"); // ACK to PhonePe
+      console.error('❌ Invalid webhook payload');
+      return res.status(200).send('OK');
     }
 
-    const { merchantOrderId, state, paymentDetails, metaInfo } = payload;
+    const { merchantOrderId, state, paymentDetails } = payload;
 
-    if (state === "COMPLETED") {
-      const phonepeTxn = paymentDetails?.[0]?.transactionId || null;
-      const paymentMode = paymentDetails?.[0]?.paymentMode || "UNKNOWN";
-      const email = metaInfo?.udf1 || null;
-
-      // 1️⃣ Check if appointment already exists
-      const existing = await Appointment.findOne({ paymentTxnId: merchantOrderId });
-      if (!existing) {
-        // 2️⃣ Find Pending Appointment
-        const pending = await PendingAppointment.findOne({ txnId: merchantOrderId });
-        if (pending) {
-          // ✅ Create confirmed appointment
-          const appointment = new Appointment({
-            appointmentId: 'APT_' + Date.now(),
-            userEmail: pending.email,
-            userMobile: pending.mobile,
-            doctor: pending.doctor || 'General',
-            date: pending.date,
-            notes: pending.notes || '',
-            fee: pending.amount,
-            status: 'confirmed',
-            paymentMode,
-            paymentTxnId: merchantOrderId,  // our txnId
-            transactionId: phonepeTxn,      // PhonePe’s txnId
-            paymentConfirmedVia: "webhook"
-          });
-
-          await appointment.save();
-          await PendingAppointment.deleteOne({ _id: pending._id });
-
-          console.log(`✅ Appointment confirmed for ${email}, TXN: ${merchantOrderId}`);
-        } else {
-          console.warn("⚠️ Pending appointment not found for:", merchantOrderId);
-        }
-      } else {
-        console.log("ℹ️ Appointment already exists, skipping duplicate:", merchantOrderId);
-      }
-    } else {
-      // ❌ Payment failed or expired → cleanup
-      await PendingAppointment.deleteOne({ txnId: payload.merchantOrderId });
-      console.log(`❌ Payment failed/expired: ${payload.merchantOrderId}`);
+    if (state !== 'COMPLETED') {
+      await PendingAppointment.deleteOne({ txnId: merchantOrderId });
+      console.log('❌ Payment failed or expired:', merchantOrderId);
+      return res.status(200).send('OK');
     }
 
-    res.status(200).send("OK"); // Always ACK to PhonePe
+    // Prevent duplicate appointments
+    const existing = await Appointment.findOne({ paymentTxnId: merchantOrderId });
+    if (existing) {
+      console.log('ℹ️ Appointment already exists:', merchantOrderId);
+      return res.status(200).send('OK');
+    }
+
+    const pending = await PendingAppointment.findOne({ txnId: merchantOrderId });
+    if (!pending) {
+      console.error('❌ PendingAppointment NOT FOUND:', merchantOrderId);
+      return res.status(200).send('OK');
+    }
+
+    // 🔑 Determine patient name
+    let patientName = 'Self';
+
+    if (pending.patient?.type === 'self') {
+      patientName = pending.patient.name;
+    }
+
+    if (pending.patient?.type === 'family') {
+      const user = await User.findOne({ mobile: pending.mobile });
+      const member = user?.familyMembers?.id(pending.patient.memberId);
+      patientName = member ? member.name : 'Family Member';
+    }
+
+    const phonepeTxn = paymentDetails?.[0]?.transactionId || null;
+    const paymentMode = paymentDetails?.[0]?.paymentMode || 'ONLINE';
+
+    const appointment = new Appointment({
+      appointmentId: 'APT_' + Date.now(),
+
+      userMobile: pending.mobile,
+      userEmail: pending.email || null,
+
+      patientName,
+      doctor: 'General',
+
+      date: new Date(),
+      notes: pending.notes || '',
+
+      fee: pending.amount,
+      paymentTxnId: merchantOrderId,
+      paymentMethod: paymentMode,
+
+      status: 'confirmed',
+      viewed: false
+    });
+
+    await appointment.save();
+    await PendingAppointment.deleteOne({ _id: pending._id });
+
+    console.log('✅ Appointment CREATED:', patientName, merchantOrderId);
+    res.status(200).send('OK');
+
   } catch (err) {
-    console.error("❌ Webhook error (Appointments):", err);
-    res.status(200).send("OK");
+    console.error('❌ Webhook error:', err);
+    res.status(200).send('OK');
   }
 });
 
