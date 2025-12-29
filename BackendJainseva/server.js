@@ -341,6 +341,7 @@ app.post('/api/payment/initiate', async (req, res) => {
       amount,
       purpose,
       notes,
+      patient,
       status: 'pending'
     });
 

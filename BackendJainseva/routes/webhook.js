@@ -31,6 +31,7 @@ router.post('/phonepe/webhook', async (req, res) => {
             appointmentId: 'APT_' + Date.now(),
             userEmail: pending.email,
             userMobile: pending.mobile,
+            patient: pending.patient, 
             doctor: pending.doctor || 'General',
             date: pending.date,
             notes: pending.notes || '',
