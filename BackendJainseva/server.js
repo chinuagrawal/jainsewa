@@ -36,12 +36,6 @@ app.use('/api', webhookRoutes);
 
 
 
-const deleteUserRoute = require('./routes/deleteuser');
-app.use('/api', deleteUserRoute);
-
-const blockUserRoute = require('./routes/blockuser');
-app.use('/api', blockUserRoute);
-
 
 
 
