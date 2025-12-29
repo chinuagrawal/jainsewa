@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const PendingAppointmentSchema = new mongoose.Schema({
-  patient: {
-  type: Object,
-  required: true
-  },
-  doctor: { type: String },
   txnId: { type: String, required: true, unique: true },
   email: { type: String },                     // ✅ optional now
   mobile: { type: String, required: true },
@@ -14,7 +9,6 @@ const PendingAppointmentSchema = new mongoose.Schema({
   notes: { type: String },
   status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
   createdAt: { type: Date, default: Date.now }
-  
 });
 
 module.exports = mongoose.model('PendingAppointment', PendingAppointmentSchema);
