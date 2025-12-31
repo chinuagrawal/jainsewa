@@ -1041,14 +1041,21 @@
       confirmPay.disabled = true;
 
       try {
-        const paymentData = {
-          amount,
-          email: user.email,
-          mobile: user.mobile,
-          purpose: "Appointment Booking",
-          notes: `Booking for ${name}`,
-          paymentMethod: "online",
-        };
+       const paymentData = {
+  amount,
+  email: user.email,
+  mobile: user.mobile,
+  purpose: "Appointment Booking",
+  notes,
+  paymentMethod: "online",
+
+  // 🔴 SEND PATIENT INFO
+  patient: {
+    type: selectedFor === "self" ? "self" : "family",
+    familyMemberId: selectedFor === "self" ? null : selectedFor
+  }
+};
+
 
         const res = await fetch(
           "https://jainsewa-backend.onrender.com/api/payment/initiate",

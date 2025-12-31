@@ -328,15 +328,19 @@ app.post('/api/payment/initiate', async (req, res) => {
   console.log(`✅ PhonePe Payment initiated for ${mobile}, TXN: ${merchantTransactionId}`);
 
   try {
-    // ✅ Save pending appointment
-    await PendingAppointment.create({
-      txnId: merchantTransactionId,
-      mobile,
-      amount,
-      purpose,
-      notes,
-      status: 'pending'
-    });
+    const { patient } = req.body;
+
+await PendingAppointment.create({
+  txnId: merchantTransactionId,
+  email,
+  mobile,
+  amount,
+  purpose,
+  notes,
+  patient, // 🔴 STORE PATIENT
+  status: "pending"
+});
+
 
     const accessToken = await getPhonePeAccessToken();
 

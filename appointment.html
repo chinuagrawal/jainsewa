@@ -102,9 +102,11 @@
             <td><input type="checkbox" ${appt.viewed ? "checked" : ""}></td>
             <td>
   <a href="patient-details.html?id=${appt._id}">
-    ${appt.patientName || '-'}
+    ${appt.patient?.name || "-"}
+    ${appt.patientType === "family" ? " (Family)" : ""}
   </a>
 </td>
+
             <td>${appt.userMobile || '-'}</td>
             <td>${appt.patientEmail || appt.userEmail || '-'}</td>
             <td>${appt.doctor || '-'}</td>
