@@ -1013,95 +1013,86 @@
 
     // Confirm pay -> call /api/payment/initiate, then redirect to gateway using returned redirectUrl
     confirmPay.addEventListener("click", async function () {
-      const notes = document.getElementById("payNotes").value || "";
-      const paymentMethod =
-        document.getElementById("paymentMethod").value || "phonepe";
-      const amount = Number(feeAmount.innerText) || 59;
+  const notes = document.getElementById("payNotes").value || "";
+  const amount = Number(feeAmount.innerText) || 59;
+  const selectedFor = appointmentFor.value;
 
-      const selectedFor = appointmentFor.value;
+  confirmPay.innerText = "Processing...";
+  confirmPay.disabled = true;
 
-      // patient object (important)
-      let patient;
+  try {
+    // ✅ 1. BUILD PATIENT DATA FIRST
+    let patientData;
 
-      if (selectedFor === "self") {
-        patient = {
-          type: "self",
-          name: `${user.firstName} ${user.lastName}`,
-          mobile: user.mobile,
-        };
-      } else {
-        patient = {
-          type: "family",
-          memberId: selectedFor, // MongoDB _id
-          parentMobile: user.mobile,
-        };
-      }
-
-      confirmPay.innerText = "Processing...";
-      confirmPay.disabled = true;
-
-      try {
-       const paymentData = {
-  amount,
-  email: user.email,
-  mobile: user.mobile,
-  purpose: "Appointment Booking",
-  notes,
-  paymentMethod: "online",
-
-  // 🔴 SEND PATIENT INFO
-  patient: {
-    type: selectedFor === "self" ? "self" : "family",
-    familyMemberId: selectedFor === "self" ? null : selectedFor
-  }
-};
-
-
-        const res = await fetch(
-          "https://jainsewa-backend.onrender.com/api/payment/initiate",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(paymentData),
-          }
-        );
-
-        const data = await res.json();
-
-        // Store pending data for post-payment processing
-        sessionStorage.setItem(
-          "pendingBooking",
-          JSON.stringify({
-            txnId: data.merchantTransactionId,
-          })
-        );
-
-        sessionStorage.setItem(
-          "pendingAppointment",
-          JSON.stringify({
-            email: user.email,
-            mobile: user.mobile,
-            name: `${user.firstName} ${user.lastName}`,
-            fee: amount,
-            notes,
-          })
-        );
-
-        if (res.ok && data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-        } else {
-          alert(
-            data.message || "Payment initiation failed. Please try again."
-          );
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Server error while initiating payment.");
-      } finally {
-        confirmPay.innerText = "Proceed to Pay";
+    if (selectedFor === "self") {
+      patientData = {
+        type: "self",
+        name: `${user.firstName} ${user.lastName}`,
+        gender: user.gender,
+        city: user.city,
+        state: user.state,
+        disease: user.disease
+      };
+    } else {
+      const member = FAMILY_MEMBERS.find(m => m._id === selectedFor);
+      if (!member) {
+        alert("Family member not found");
         confirmPay.disabled = false;
+        confirmPay.innerText = "Proceed to Pay";
+        return;
       }
-    });
+
+      patientData = {
+        type: "family",
+        name: member.name,
+        relation: member.relation,
+        age: member.age,
+        gender: member.gender,
+        city: member.city,
+        state: member.state,
+        disease: member.disease
+      };
+    }
+
+    // ✅ 2. BUILD PAYMENT PAYLOAD (CLEAN)
+    const paymentData = {
+      amount,
+      email: user.email,
+      mobile: user.mobile,
+      notes,
+      paymentMethod: "online",
+      purpose: "Appointment Booking",
+
+      // ⭐ THIS IS WHAT BACKEND NEEDS
+      patient: patientData
+    };
+
+    // ✅ 3. CALL BACKEND
+    const res = await fetch(
+      "https://jainsewa-backend.onrender.com/api/payment/initiate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paymentData),
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.ok && data.redirectUrl) {
+      window.location.href = data.redirectUrl;
+    } else {
+      alert(data.message || "Payment initiation failed");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error while initiating payment.");
+  } finally {
+    confirmPay.innerText = "Proceed to Pay";
+    confirmPay.disabled = false;
+  }
+});
 
     //
 

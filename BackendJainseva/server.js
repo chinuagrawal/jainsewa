@@ -319,34 +319,48 @@ const getPhonePeAccessToken = async () => {
 
 
 app.post('/api/payment/initiate', async (req, res) => {
-  const { amount, email, mobile, purpose, notes, paymentMethod } = req.body;
-  const merchantTransactionId = 'TXN_' + Date.now();
-  const merchantId = process.env.PHONEPE_MERCHANT_ID;
-  const baseUrl = process.env.PHONEPE_BASE_URL;
-  const redirectUrl = `${process.env.PHONEPE_REDIRECT_URL}?txnId=${merchantTransactionId}`;
-
-  console.log(`✅ PhonePe Payment initiated for ${mobile}, TXN: ${merchantTransactionId}`);
-
   try {
-    const { patient } = req.body;
+    const { amount, email, mobile, purpose, notes, paymentMethod, patient } = req.body;
 
-await PendingAppointment.create({
-  txnId: merchantTransactionId,
-  email,
-  mobile,
-  amount,
-  purpose,
-  notes,
-  patient, // 🔴 STORE PATIENT
-  status: "pending"
-});
+    // ✅ HARD VALIDATION (VERY IMPORTANT)
+    if (!patient || !patient.type) {
+      return res.status(400).json({
+        message: "Patient information is required",
+      });
+    }
 
+    const merchantTransactionId = 'TXN_' + Date.now();
+    const merchantId = process.env.PHONEPE_MERCHANT_ID;
+    const baseUrl = process.env.PHONEPE_BASE_URL;
+    const redirectUrl = `${process.env.PHONEPE_REDIRECT_URL}?txnId=${merchantTransactionId}`;
+
+    console.log(`✅ PhonePe Payment initiated for ${mobile}, TXN: ${merchantTransactionId}`);
+
+    // ✅ STORE PENDING APPOINTMENT WITH FULL PATIENT SNAPSHOT
+    await PendingAppointment.create({
+      txnId: merchantTransactionId,
+      email,
+      mobile,
+      amount,
+      purpose,
+      notes,
+      paymentMethod: "online",
+      patient: {
+        type: patient.type,               // "self" | "family"
+        name: patient.name,
+        relation: patient.relation || null,
+        age: patient.age || null,
+        gender: patient.gender || null,
+        city: patient.city || null,
+        state: patient.state || null,
+        disease: patient.disease || null
+      },
+      status: "pending"
+    });
 
     const accessToken = await getPhonePeAccessToken();
 
-
-
-    // ✅ Prepare payload
+    // ✅ PHONEPE PAYLOAD
     const payload = {
       merchantId,
       merchantOrderId: merchantTransactionId,
@@ -354,34 +368,34 @@ await PendingAppointment.create({
       expireAfter: 1200,
       metaInfo: { udf1: mobile },
       paymentFlow: {
-        type: 'PG_CHECKOUT',
-        redirectMode: 'AUTO',
+        type: "PG_CHECKOUT",
+        redirectMode: "AUTO",
         merchantUrls: { redirectUrl }
-      },
+      }
     };
 
-    // ✅ Call PhonePe Initiate API
     const response = await axios.post(
-          `${baseUrl}/apis/pg/checkout/v2/pay`,
+      `${baseUrl}/apis/pg/checkout/v2/pay`,
       payload,
       {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `O-Bearer ${accessToken}`
+          "Content-Type": "application/json",
+          "Authorization": `O-Bearer ${accessToken}`
         }
       }
     );
 
-    const redirectUrlFromResponse = response.data.redirectUrl || redirectUrl;
-
     res.json({
-      redirectUrl: redirectUrlFromResponse,
+      redirectUrl: response.data.redirectUrl || redirectUrl,
       merchantTransactionId
     });
 
   } catch (err) {
     console.error("❌ PhonePe API Error:", err.response?.data || err.message);
-    res.status(500).json({ message: 'PhonePe API error', details: err.response?.data || err.message });
+    res.status(500).json({
+      message: "PhonePe API error",
+      details: err.response?.data || err.message
+    });
   }
 });
 
