@@ -954,6 +954,9 @@
           // optionally clear UI or redirect to signup
           return;
         }
+        // ✅ overwrite localStorage user with full data
+localStorage.setItem("user", JSON.stringify(data));
+
 
         const keys = [
           ["First Name", "firstName"],
@@ -1013,6 +1016,8 @@
 
     // Confirm pay -> call /api/payment/initiate, then redirect to gateway using returned redirectUrl
     confirmPay.addEventListener("click", async function () {
+      const user = JSON.parse(localStorage.getItem("user"));
+
   const notes = document.getElementById("payNotes").value || "";
   const amount = Number(feeAmount.innerText) || 59;
   const selectedFor = appointmentFor.value;
