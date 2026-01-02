@@ -941,7 +941,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadFamilyMembers();
   loadAppointments();
   attachEvents();
-
+const params = new URLSearchParams(window.location.search);
+  if (params.get("autoPay") === "1") {
+    setTimeout(() => {
+      openAndAutoPay();
+    }, 500); // small delay for UI stability
+  }
   // ✅ SHOW CONFIRMATION MODAL IF PAYMENT RETURNED
   const saved = sessionStorage.getItem("paymentSuccessData");
   if (saved) {
@@ -1255,6 +1260,24 @@ document.getElementById("contactBtn").onclick = () =>
     modal.classList.add("hidden");
     window.location.href = "p-dashboard.html";
   };
+}
+function openAndAutoPay() {
+  // 1️⃣ Open bottom sheet
+  sheet.classList.add("open");
+
+  // 2️⃣ Update summary values
+  document.getElementById("s_fee").innerText = `₹${feeAmount.innerText}`;
+  document.getElementById("s_name").innerText =
+    appointmentFor.value === "self"
+      ? `${USER.firstName} ${USER.lastName}`
+      : document.getElementById("s_name").innerText;
+
+  document.getElementById("s_mobile").innerText = USER.mobile;
+
+  // 3️⃣ Auto trigger payment after UI opens
+  setTimeout(() => {
+    initiatePayment();
+  }, 600);
 }
 
 </script>

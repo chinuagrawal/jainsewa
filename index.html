@@ -315,7 +315,8 @@ document.getElementById("appointment-form").addEventListener("submit", async fun
       if (data.user && data.user.role === "admin") {
         window.location.href = "admin.html";
       } else {
-        window.location.href = "patient-dashboard.html";
+        window.location.href = "patient-dashboard.html?autoPay=1";
+
       }
     } else {
       alert(data.message || "❌ Failed to book appointment");
