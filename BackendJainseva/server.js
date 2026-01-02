@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -319,6 +320,8 @@ const getPhonePeAccessToken = async () => {
 
 
 app.post('/api/payment/initiate', async (req, res) => {
+  console.log("🔥 RAW BODY:", req.body);
+
   try {
     const { amount, email, mobile, purpose, notes, paymentMethod, patient } = req.body;
 
