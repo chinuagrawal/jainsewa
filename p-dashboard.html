@@ -1126,7 +1126,7 @@ function attachEvents() {
    PAYMENT (FIXED)
 ========================= */
 async function initiatePayment() {
-  alert("NEW PAYMENT FUNCTION HIT");
+  
 
   confirmPay.disabled = true;
   confirmPay.innerText = "Processing...";
@@ -1174,7 +1174,7 @@ async function initiatePayment() {
 
   try {
     const res = await fetch(
-      "${API_BASE}/api/payment/initiate",
+      `https://jainsewa-backend.onrender.com/api/payment/initiate`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
