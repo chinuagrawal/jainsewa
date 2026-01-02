@@ -905,465 +905,222 @@
     </div>
   </div>
   <script>
+    
+/* =========================
+   GLOBAL STATE (SINGLE SOURCE)
+========================= */
+let USER = null;
+let FAMILY_MEMBERS = [];
+let appointmentFor, detailsGrid, confirmPay;
+let feeAmount, feeLabelDiv, sheet;
 
-  </script>
+/* =========================
+   INIT (ONLY ONE)
+========================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  appointmentFor = document.getElementById("appointmentFor");
+  detailsGrid = document.getElementById("detailsGrid");
+  confirmPay = document.getElementById("confirmPay");
+  feeAmount = document.getElementById("feeAmount");
+  feeLabelDiv = document.getElementById("feeLabel");
+  sheet = document.getElementById("sheet");
 
-  <script>
-    // --- initial
-    document.getElementById("addMemberBtn").addEventListener("click", () => {
-      window.location.href = "family-members.html";
-    });
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-      window.location.href = "login.html";
-    }
-
-    const feeAmount = document.getElementById("feeAmount");
-    const feeLabelDiv = document.getElementById("feeLabel");
-    const sheet = document.getElementById("sheet");
-    const openPay = document.getElementById("openPay");
-    const closeSheet = document.getElementById("closeSheet");
-    const confirmPay = document.getElementById("confirmPay");
-
-    // Fill minimal UI from localStorage while fetching details
-    document.getElementById("pname").innerText = user.firstName
-      ? user.firstName + (user.lastName ? " " + user.lastName : "")
-      : "—";
-    document.getElementById("pemail").innerText = user.email || "—";
-    document.getElementById("pmobile").innerText = user.mobile || "—";
-    document.getElementById("avatar").innerText =
-      (user.firstName ? user.firstName.charAt(0).toUpperCase() : "P") +
-      (user.lastName ? user.lastName.charAt(0).toUpperCase() : "");
-
-    // Fetch full user details
-    // --- Fetch full user details (replace the old fetch)
-    fetch(
-      `https://jainsewa-backend.onrender.com/api/user?mobile=${encodeURIComponent(
-        user.mobile
-      )}`
-    )
-      .then((r) => {
-        if (r.status === 400) throw new Error("Missing mobile on request");
-        if (r.status === 404) return null; // user not found
-        if (!r.ok) throw new Error("Failed to fetch user: " + r.status);
-        return r.json();
-      })
-      .then((data) => {
-        if (!data) {
-          console.warn("User not found");
-          // optionally clear UI or redirect to signup
-          return;
-        }
-        // ✅ overwrite localStorage user with full data
-localStorage.setItem("user", JSON.stringify(data));
-
-
-        const keys = [
-          ["First Name", "firstName"],
-          ["Last Name", "lastName"],
-          ["Email", "email"],
-          ["DOB", "dob"],
-          ["Gender", "gender"],
-          ["City", "city"],
-          ["State", "state"],
-          ["Disease", "disease"],
-          ["Mobile", "mobile"],
-        ];
-        const grid = document.getElementById("detailsGrid");
-        grid.innerHTML = "";
-        keys.forEach(([label, key]) => {
-          const div = document.createElement("div");
-          div.className = "kv";
-          div.innerHTML = `<b>${label}</b><span>${data[key] || "N/A"}</span>`;
-          grid.appendChild(div);
-        });
-
-        document.getElementById("pname").innerText =
-          `${data.firstName || ""} ${data.lastName || ""}`.trim() || "—";
-        document.getElementById("pemail").innerText = data.email || "—";
-        document.getElementById("pmobile").innerText = data.mobile || "—";
-        document.getElementById("s_name").innerText =
-          document.getElementById("pname").innerText;
-        document.getElementById("s_mobile").innerText = data.mobile || "—";
-
-        // You can populate payments/summary if available
-        document.getElementById(
-          "paymentsList"
-        ).innerHTML = `<div style="color:var(--muted)">No recent payments</div>`;
-        // totalConsults/pending could be set after fetching appointments
-      })
-      .catch((err) => {
-        console.error("User fetch error:", err);
-      });
-
-    // Payment sheet open/close
-    openPay.addEventListener("click", () => {
-      sheet.classList.add("open");
-      document.getElementById("s_fee").innerText = `₹${feeAmount.innerText}`;
-      document.getElementById("s_name").innerText =
-        document.getElementById("pname").innerText;
-      document.getElementById("s_mobile").innerText =
-        document.getElementById("pmobile").innerText;
-      // scroll sheet to top
-      setTimeout(() => (sheet.scrollTop = 0), 120);
-    });
-    closeSheet.addEventListener("click", () =>
-      sheet.classList.remove("open")
-    );
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") sheet.classList.remove("open");
-    });
-
-    // Confirm pay -> call /api/payment/initiate, then redirect to gateway using returned redirectUrl
-    confirmPay.addEventListener("click", async function () {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const notes = document.getElementById("payNotes").value || "";
-  const amount = Number(feeAmount.innerText) || 59;
-
-  if (!appointmentFor) {
-    alert("Appointment selector not ready");
+  USER = JSON.parse(localStorage.getItem("user"));
+  if (!USER) {
+    window.location.href = "login.html";
     return;
   }
 
-  const selectedFor = appointmentFor.value;
+  await fetchAndSyncUser();
+  await loadFamilyMembers();
+  attachHandlers();
+});
 
-  confirmPay.innerText = "Processing...";
-  confirmPay.disabled = true;
+/* =========================
+   USER FETCH (ONCE)
+========================= */
+async function fetchAndSyncUser() {
+  const res = await fetch(
+    `https://jainsewa-backend.onrender.com/api/user?mobile=${USER.mobile}`
+  );
+  const data = await res.json();
+  USER = data;
+  localStorage.setItem("user", JSON.stringify(data));
 
-  try {
-    let patientData;
+  document.getElementById("pname").innerText =
+    `${USER.firstName || ""} ${USER.lastName || ""}`.trim();
+  document.getElementById("pemail").innerText = USER.email || "—";
+  document.getElementById("pmobile").innerText = USER.mobile || "—";
+  document.getElementById("avatar").innerText =
+    (USER.firstName?.[0] || "P") + (USER.lastName?.[0] || "");
+}
 
-    if (selectedFor === "self") {
-      patientData = {
-        type: "self",
-        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        gender: user.gender || null,
-        city: user.city || null,
-        state: user.state || null,
-        disease: user.disease || null
-      };
-    } else {
-      const member = FAMILY_MEMBERS.find(m => m._id === selectedFor);
-      if (!member) {
-        alert("Family member not found");
-        return;
-      }
+/* =========================
+   LOAD FAMILY MEMBERS
+========================= */
+async function loadFamilyMembers() {
+  FAMILY_MEMBERS = USER.familyMembers || [];
 
-      patientData = {
-        type: "family",
-        name: member.name,
-        relation: member.relation,
-        age: member.age,
-        gender: member.gender,
-        city: member.city,
-        state: member.state,
-        disease: member.disease
-      };
-    }
+  appointmentFor.innerHTML = `<option value="self">Self</option>`;
+  FAMILY_MEMBERS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m._id;
+    opt.textContent = `${m.name} (${m.relation})`;
+    appointmentFor.appendChild(opt);
+  });
 
-    if (!patientData || !patientData.type) {
-      alert("Invalid patient data");
+  fillDetails({
+    name: `${USER.firstName} ${USER.lastName}`,
+    gender: USER.gender,
+    city: USER.city,
+    state: USER.state,
+    disease: USER.disease,
+    mobile: USER.mobile
+  });
+}
+
+/* =========================
+   UI HELPERS
+========================= */
+function fillDetails(d) {
+  detailsGrid.innerHTML = "";
+  [
+    ["Name", d.name],
+    ["Gender", d.gender],
+    ["City", d.city],
+    ["State", d.state],
+    ["Disease", d.disease],
+    ["Mobile", d.mobile]
+  ].forEach(([k, v]) => {
+    const div = document.createElement("div");
+    div.className = "kv";
+    div.innerHTML = `<b>${k}</b><span>${v || "N/A"}</span>`;
+    detailsGrid.appendChild(div);
+  });
+
+  document.getElementById("s_name").innerText = d.name;
+  document.getElementById("s_mobile").innerText = d.mobile;
+}
+
+function resetPayBtn() {
+  confirmPay.disabled = false;
+  confirmPay.innerText = "Proceed to Pay";
+}
+
+/* =========================
+   EVENT HANDLERS
+========================= */
+function attachHandlers() {
+  appointmentFor.addEventListener("change", () => {
+    const val = appointmentFor.value;
+
+    if (val === "self") {
+      fillDetails({
+        name: `${USER.firstName} ${USER.lastName}`,
+        gender: USER.gender,
+        city: USER.city,
+        state: USER.state,
+        disease: USER.disease,
+        mobile: USER.mobile
+      });
       return;
     }
 
-    const paymentData = {
-      amount,
-      email: user.email,
-      mobile: user.mobile,
-      purpose: "Appointment Booking",
-      paymentMethod: "online",
-      notes,
-      patient: patientData
+    const m = FAMILY_MEMBERS.find(x => x._id === val);
+    if (!m) return;
+
+    fillDetails({
+      name: m.name,
+      gender: m.gender,
+      city: m.city,
+      state: m.state,
+      disease: m.disease,
+      mobile: USER.mobile
+    });
+  });
+
+  document.getElementById("openPay").addEventListener("click", () => {
+    sheet.classList.add("open");
+    document.getElementById("s_fee").innerText = `₹${feeAmount.innerText}`;
+  });
+
+  document.getElementById("closeSheet").onclick = () =>
+    sheet.classList.remove("open");
+
+  confirmPay.addEventListener("click", handlePayment);
+}
+
+/* =========================
+   PAYMENT FLOW (FIXED)
+========================= */
+async function handlePayment() {
+  confirmPay.disabled = true;
+  confirmPay.innerText = "Processing...";
+
+  const selected = appointmentFor.value;
+  let patient;
+
+  if (selected === "self") {
+    patient = {
+      type: "self",
+      name: `${USER.firstName} ${USER.lastName}`,
+      gender: USER.gender,
+      city: USER.city,
+      state: USER.state,
+      disease: USER.disease
     };
+  } else {
+    const m = FAMILY_MEMBERS.find(x => x._id === selected);
+    if (!m) {
+      alert("Family member not found");
+      resetPayBtn();
+      return;
+    }
+    patient = {
+      type: "family",
+      name: m.name,
+      relation: m.relation,
+      age: m.age,
+      gender: m.gender,
+      city: m.city,
+      state: m.state,
+      disease: m.disease
+    };
+  }
 
-    console.log("PAYLOAD →", paymentData); // 👈 DEBUG
+  const payload = {
+    amount: Number(feeAmount.innerText),
+    email: USER.email,
+    mobile: USER.mobile,
+    purpose: "Appointment Booking",
+    paymentMethod: "online",
+    notes: document.getElementById("payNotes").value || "",
+    patient
+  };
 
+  try {
     const res = await fetch(
       "https://jainsewa-backend.onrender.com/api/payment/initiate",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify(payload)
       }
     );
 
     const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message);
-      return;
-    }
+    if (!res.ok) throw new Error(data.message);
 
     window.location.href = data.redirectUrl;
-
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  } finally {
-    confirmPay.innerText = "Proceed to Pay";
-    confirmPay.disabled = false;
+  } catch (e) {
+    alert(e.message || "Payment failed");
+    resetPayBtn();
   }
-});
+}
 
-    //
-
-    // Fetch patient's existing appointments to determine fee and label
-    fetch(`https://jainsewa-backend.onrender.com/api/appointments?mobile=${user.mobile}`)
-      .then((r) => r.json())
-      .then((list) => {
-        const container = document.getElementById("appts");
-        const feeAmount = document.getElementById("feeAmount"); // make sure these exist
-        const feeLabelDiv = document.getElementById("feeLabel");
-
-        container.innerHTML = "";
-
-        // Determine consultation fee and label based on previous appointments
-        let baseFee = 2;
-        let feeLabel = "Consultation Fee";
-        if (list.length >= 1) {
-          // patient already has 1 appointment
-          baseFee = 1;
-          feeLabel = "Reconsultation Fee";
-        }
-
-        // Update paybar only if elements exist
-        if (feeAmount) feeAmount.innerText = baseFee;
-        if (feeLabelDiv) feeLabelDiv.innerText = feeLabel;
-
-        // Render upcoming appointments
-        if (!list.length) {
-          container.innerHTML = `<div style="color:var(--muted)">No upcoming appointments</div>`;
-          return;
-        }
-
-        list.forEach((appt) => {
-          const div = document.createElement("div");
-          div.className = "appt";
-          div.innerHTML = `
-        <div>
-          <div><b>${appt.doctor}</b></div>
-          <div style="font-size:13px;color:var(--muted)">${new Date(
-            appt.createdAt
-          ).toLocaleDateString()}</div>
-        </div>
-        <div style="color:var(--accent);font-weight:600">₹${appt.fee}</div>
-      `;
-          container.appendChild(div);
-        });
-      })
-      .catch((err) => console.error(err));
-    // Check for success query param to show confirmation modal
-    // ✅ Corrected Code
-    document.addEventListener("DOMContentLoaded", () => {
-      // Check for URL parameters as soon as the page loads
-      const params = new URLSearchParams(window.location.search);
-
-      if (params.get("success") === "1") {
-        const name = params.get("name");
-        const mob = params.get("mob");
-        const txnId = params.get("txnId");
-
-        // If the parameters exist, show the modal
-        showConfirmationModal(name, mob, txnId);
-
-        // Optional: Clean the URL to avoid the modal reappearing on refresh
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname
-        );
-      }
-    });
-    //confirmation model
-    function showConfirmationModal(name, mob, txnId) {
-      const modal = document.getElementById("confirmation-modal");
-      const details = document.getElementById("confirmation-details");
-      const closeBtn = document.getElementById("close-modal");
-
-      details.innerHTML = `
-  <h2>✅ अपॉइंटमेंट कन्फर्म हो गया!</h2>
-  
-    प्रिय <strong>${name}</strong>,<br>
-    आपका अपॉइंटमेंट सफलतापूर्वक बुक हो गया है।<br><br>
-    
-    📞 मोबाइल नंबर: <strong>${mob}</strong><br>
-    💳 ट्रांज़ैक्शन आईडी: <strong>${txnId}</strong><br><br>
-    
-    👨‍⚕️ डॉक्टर आपसे शीघ्र ही संपर्क करेंगे।<br><br>
-    धन्यवाद, स्वस्थ रहें!
-  
-`;
-
-      modal.classList.remove("hidden");
-
-      closeBtn.onclick = () => {
-        modal.classList.add("hidden");
-        window.location.href = "patient-dashboard.html"; // 🔁 Redirect and reload to show updated seat
-      };
-    }
-
-    // Quick actions
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
-    });
-    document.getElementById("editProfile").addEventListener("click", () => {
-      window.location.href = "signup.html";
-    });
-    document.getElementById("contactBtn").addEventListener("click", () => {
-      window.location.href = "tel:8870969514";
-    });
-    document.getElementById("newAppt").addEventListener("click", () => {
-      alert("Appointment booking not implemented in this demo.");
-    });
-    document.getElementById("viewHistory").addEventListener("click", () => {
-      alert("History page not implemented in this demo.");
-    });
-  </script>
-  <script>
-    // 🔹 GLOBAL STORE
-    let FAMILY_MEMBERS = [];
-
-    const appointmentFor = document.getElementById("appointmentFor");
-    const detailsGrid = document.getElementById("detailsGrid");
-
-    // 🔹 Load family members on page load
-    document.addEventListener("DOMContentLoaded", loadFamilyMembers);
-
-    async function loadFamilyMembers() {
-      try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (!user) return;
-
-        const res = await fetch(
-          `https://jainsewa-backend.onrender.com/api/user?mobile=${user.mobile}`
-        );
-        const data = await res.json();
-
-        FAMILY_MEMBERS = data.familyMembers || [];
-
-        appointmentFor.innerHTML = `<option value="self">Self</option>`;
-
-        FAMILY_MEMBERS.forEach(member => {
-          const opt = document.createElement("option");
-          opt.value = member._id;
-          opt.textContent = `${member.name} (${member.relation})`;
-          appointmentFor.appendChild(opt);
-        });
-
-        // 🔹 default = self
-        fillDetails({
-          name: `${user.firstName} ${user.lastName}`,
-          age: "",
-          gender: data.gender,
-          city: data.city,
-          state: data.state,
-          disease: data.disease,
-          mobile: data.mobile
-        });
-
-      } catch (err) {
-        console.error("Family load error:", err);
-      }
-    }
-
-    // 🔹 Listen to dropdown change
-    appointmentFor.addEventListener("change", handlePatientChange);
-
-    function handlePatientChange() {
-      const selected = appointmentFor.value;
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      if (selected === "self") {
-        fillDetails({
-          name: `${user.firstName} ${user.lastName}`,
-          age: "",
-          gender: user.gender,
-          city: user.city,
-          state: user.state,
-          disease: user.disease,
-          mobile: user.mobile
-        });
-        return;
-      }
-
-      const member = FAMILY_MEMBERS.find(m => m._id === selected);
-      if (!member) return;
-
-      fillDetails({
-        name: member.name,
-        age: member.age,
-        gender: member.gender,
-        city: member.city,
-        state: member.state,
-        disease: member.disease,
-        mobile: user.mobile
-      });
-    }
-
-    // 🔹 Update UI
-    function fillDetails(data) {
-      detailsGrid.innerHTML = "";
-
-      const fields = [
-        ["Name", data.name],
-        ["Age", data.age],
-        ["Gender", data.gender],
-        ["City", data.city],
-        ["State", data.state],
-        ["Disease", data.disease],
-        ["Mobile", data.mobile]
-      ];
-
-      fields.forEach(([label, value]) => {
-        const div = document.createElement("div");
-        div.className = "kv";
-        div.innerHTML = `<b>${label}</b><span>${value || "N/A"}</span>`;
-        detailsGrid.appendChild(div);
-      });
-
-      // 🔹 Payment sheet sync
-      document.getElementById("s_name").innerText = data.name;
-      document.getElementById("s_mobile").innerText = data.mobile;
-    }
-    function onPatientChange() {
-      const selected = appointmentFor.value;
-      const grid = document.getElementById("detailsGrid");
-
-      // SELF
-      if (selected === "self") {
-        grid.innerHTML = `
-      <div class="kv"><b>Name</b><span>${user.firstName} ${user.lastName}</span></div>
-      <div class="kv"><b>Gender</b><span>${user.gender || "N/A"}</span></div>
-      <div class="kv"><b>City</b><span>${user.city || "N/A"}</span></div>
-      <div class="kv"><b>State</b><span>${user.state || "N/A"}</span></div>
-      <div class="kv"><b>Disease</b><span>${user.disease || "N/A"}</span></div>
-      <div class="kv"><b>Mobile</b><span>${user.mobile}</span></div>
-    `;
-        return;
-      }
-
-      // FAMILY MEMBER
-      const member = FAMILY_MEMBERS.find(m => m._id === selected);
-      if (!member) return;
-
-      grid.innerHTML = `
-    <div class="kv"><b>Name</b><span>${member.name}</span></div>
-    <div class="kv"><b>Relation</b><span>${member.relation}</span></div>
-    <div class="kv"><b>Age</b><span>${member.age}</span></div>
-    <div class="kv"><b>Gender</b><span>${member.gender}</span></div>
-    <div class="kv"><b>City</b><span>${member.city || "N/A"}</span></div>
-    <div class="kv"><b>State</b><span>${member.state || "N/A"}</span></div>
-    <div class="kv"><b>Disease</b><span>${member.disease || "N/A"}</span></div>
-    <div class="kv"><b>Mobile</b><span>${user.mobile}</span></div>
-  `;
-
-      // sync payment sheet (safe)
-      document.getElementById("s_name").innerText = member.name;
-      document.getElementById("s_mobile").innerText = user.mobile;
-    }
 
   </script>
+  
 
 </body>
 
