@@ -134,7 +134,11 @@
       const firstName = document.getElementById("first-name").value;
       const lastName = document.getElementById("last-name").value;
       const email = document.getElementById("email").value || null;
-      const dob = document.getElementById("dob").value;
+      const dobInput = document.getElementById("dob").value;
+
+// convert 25-07-1999 → 1999-07-25
+const [day, month, year] = dobInput.split("-");
+const dob = `${year}-${month}-${day}`;
       const gender = document.getElementById("gender").value;
       const city = document.getElementById("city").value;
       const state = document.getElementById("state").value;

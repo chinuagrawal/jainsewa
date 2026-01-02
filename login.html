@@ -78,7 +78,11 @@
       e.preventDefault();
 
       const loginId = document.getElementById("loginId").value.trim();
-      const dob = document.getElementById("dob").value; // from date input
+      const dobInput = document.getElementById("dob").value;
+
+// convert 25-07-1999 → 1999-07-25
+const [day, month, year] = dobInput.split("-");
+const dob = `${year}-${month}-${day}`;
 
       if (!dob) {
         alert("Please enter your Date of Birth.");
