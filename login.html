@@ -16,6 +16,9 @@
   <title>Login (लॉगिन)</title>
   <link rel="stylesheet" href="./login.css">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 </head>
 
 <body>
@@ -39,7 +42,15 @@
         <div class="login__box">
           <i class="ri-calendar-line login__icon"></i>
           <div class="login__box-input">
-            <input type="date" id="dob" required class="login__input" placeholder=" " />
+            <input
+  type="text"
+  id="dob"
+  required
+  class="login__input"
+  placeholder=""
+  readonly
+>
+            
             <label class="login__label">Date of Birth (जन्म तिथि)</label>
           </div>
         </div>
@@ -104,5 +115,14 @@
       }
     });
   </script>
+  <script>
+  flatpickr("#dob", {
+    dateFormat: "d-m-Y",
+    maxDate: "today",
+    yearSelectorType: "dropdown",
+    disableMobile: true, // 🔥 IMPORTANT for Android
+    defaultHour: 12
+  });
+</script>
 </body>
 </html>
