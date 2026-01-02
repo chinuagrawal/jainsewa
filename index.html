@@ -30,6 +30,9 @@ http://www.tooplate.com/view/2098-health
 
   <!-- MAIN CSS -->
   <link rel="stylesheet" href="css/tooplate-style.css?v=1.0.1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 
 </head>
 
@@ -236,7 +239,15 @@ http://www.tooplate.com/view/2098-health
 
             <div class="col-md-6 col-sm-6">
               <label for="dob">Date of Birth / जन्म तिथि</label>
-              <input type="date" class="form-control" id="dob" required>
+               <input
+  type="text"
+  id="dob"
+  required
+  class="form-control"
+  placeholder=""
+  readonly
+>
+              
             </div>
 
             <div class="col-md-6 col-sm-6">
@@ -653,7 +664,15 @@ document.getElementById("appointment-form").addEventListener("submit", async fun
   <script src="js/sidepanel.js"></script>
   <script src="js/testimonial2.js"></script>
 <!--<script src="js/testimonial.js"></script>-->
-
+<script>
+  flatpickr("#dob", {
+    dateFormat: "d-m-Y",
+    maxDate: "today",
+    yearSelectorType: "dropdown",
+    disableMobile: true, // 🔥 IMPORTANT for Android
+    defaultHour: 12
+  });
+</script>
 
 
 </body>
