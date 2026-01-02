@@ -306,7 +306,7 @@ document.getElementById("appointment-form").addEventListener("submit", async fun
     const data = await res.json();
 
     if (res.ok) {
-      alert("✅ Appointment / Registration successful!");
+      
 
       // auto login
       localStorage.setItem("user", JSON.stringify(data.user));
