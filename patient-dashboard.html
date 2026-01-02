@@ -904,18 +904,18 @@
       <button id="close-modal">OK</button>
     </div>
   </div>
-  <script>
-    
+<script>
 /* =========================
-   GLOBAL STATE (SINGLE SOURCE)
+   GLOBAL STATE (ONE SOURCE)
 ========================= */
 let USER = null;
 let FAMILY_MEMBERS = [];
+
 let appointmentFor, detailsGrid, confirmPay;
 let feeAmount, feeLabelDiv, sheet;
 
 /* =========================
-   INIT (ONLY ONE)
+   INIT – SINGLE ENTRY POINT
 ========================= */
 document.addEventListener("DOMContentLoaded", async () => {
   appointmentFor = document.getElementById("appointmentFor");
@@ -925,25 +925,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   feeLabelDiv = document.getElementById("feeLabel");
   sheet = document.getElementById("sheet");
 
+  // auth
   USER = JSON.parse(localStorage.getItem("user"));
   if (!USER) {
     window.location.href = "login.html";
     return;
   }
 
-  await fetchAndSyncUser();
-  await loadFamilyMembers();
-  attachHandlers();
+  await fetchUser();
+  loadFamilyMembers();
+  attachEvents();
 });
 
 /* =========================
-   USER FETCH (ONCE)
+   FETCH USER (ONCE)
 ========================= */
-async function fetchAndSyncUser() {
+async function fetchUser() {
   const res = await fetch(
     `https://jainsewa-backend.onrender.com/api/user?mobile=${USER.mobile}`
   );
   const data = await res.json();
+
   USER = data;
   localStorage.setItem("user", JSON.stringify(data));
 
@@ -958,7 +960,7 @@ async function fetchAndSyncUser() {
 /* =========================
    LOAD FAMILY MEMBERS
 ========================= */
-async function loadFamilyMembers() {
+function loadFamilyMembers() {
   FAMILY_MEMBERS = USER.familyMembers || [];
 
   appointmentFor.innerHTML = `<option value="self">Self</option>`;
@@ -969,7 +971,14 @@ async function loadFamilyMembers() {
     appointmentFor.appendChild(opt);
   });
 
-  fillDetails({
+  showSelf();
+}
+
+/* =========================
+   UI HELPERS
+========================= */
+function showSelf() {
+  updateDetails({
     name: `${USER.firstName} ${USER.lastName}`,
     gender: USER.gender,
     city: USER.city,
@@ -979,10 +988,7 @@ async function loadFamilyMembers() {
   });
 }
 
-/* =========================
-   UI HELPERS
-========================= */
-function fillDetails(d) {
+function updateDetails(d) {
   detailsGrid.innerHTML = "";
   [
     ["Name", d.name],
@@ -1008,59 +1014,52 @@ function resetPayBtn() {
 }
 
 /* =========================
-   EVENT HANDLERS
+   EVENTS
 ========================= */
-function attachHandlers() {
-  appointmentFor.addEventListener("change", () => {
-    const val = appointmentFor.value;
+function attachEvents() {
+  document.getElementById("addMemberBtn").onclick = () =>
+    window.location.href = "family-members.html";
 
-    if (val === "self") {
-      fillDetails({
-        name: `${USER.firstName} ${USER.lastName}`,
-        gender: USER.gender,
-        city: USER.city,
-        state: USER.state,
-        disease: USER.disease,
-        mobile: USER.mobile
-      });
+  appointmentFor.onchange = () => {
+    if (appointmentFor.value === "self") {
+      showSelf();
       return;
     }
 
-    const m = FAMILY_MEMBERS.find(x => x._id === val);
-    if (!m) return;
+    const m = FAMILY_MEMBERS.find(x => x._id === appointmentFor.value);
+    if (m) {
+      updateDetails({
+        name: m.name,
+        gender: m.gender,
+        city: m.city,
+        state: m.state,
+        disease: m.disease,
+        mobile: USER.mobile
+      });
+    }
+  };
 
-    fillDetails({
-      name: m.name,
-      gender: m.gender,
-      city: m.city,
-      state: m.state,
-      disease: m.disease,
-      mobile: USER.mobile
-    });
-  });
-
-  document.getElementById("openPay").addEventListener("click", () => {
+  document.getElementById("openPay").onclick = () => {
     sheet.classList.add("open");
     document.getElementById("s_fee").innerText = `₹${feeAmount.innerText}`;
-  });
+  };
 
   document.getElementById("closeSheet").onclick = () =>
     sheet.classList.remove("open");
 
-  confirmPay.addEventListener("click", handlePayment);
+  confirmPay.onclick = initiatePayment;
 }
 
 /* =========================
-   PAYMENT FLOW (FIXED)
+   PAYMENT (FIXED)
 ========================= */
-async function handlePayment() {
+async function initiatePayment() {
   confirmPay.disabled = true;
   confirmPay.innerText = "Processing...";
 
-  const selected = appointmentFor.value;
   let patient;
 
-  if (selected === "self") {
+  if (appointmentFor.value === "self") {
     patient = {
       type: "self",
       name: `${USER.firstName} ${USER.lastName}`,
@@ -1070,12 +1069,13 @@ async function handlePayment() {
       disease: USER.disease
     };
   } else {
-    const m = FAMILY_MEMBERS.find(x => x._id === selected);
+    const m = FAMILY_MEMBERS.find(x => x._id === appointmentFor.value);
     if (!m) {
       alert("Family member not found");
       resetPayBtn();
       return;
     }
+
     patient = {
       type: "family",
       name: m.name,
@@ -1112,15 +1112,24 @@ async function handlePayment() {
     if (!res.ok) throw new Error(data.message);
 
     window.location.href = data.redirectUrl;
-  } catch (e) {
-    alert(e.message || "Payment failed");
+  } catch (err) {
+    alert(err.message || "Payment failed");
     resetPayBtn();
   }
 }
 
-
-  </script>
-  
+/* =========================
+   LOGOUT / ACTIONS
+========================= */
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+};
+document.getElementById("editProfile").onclick = () =>
+  window.location.href = "signup.html";
+document.getElementById("contactBtn").onclick = () =>
+  window.location.href = "tel:8870969514";
+</script>
 
 </body>
 
