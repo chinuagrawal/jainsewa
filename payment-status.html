@@ -44,44 +44,44 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const txnId = urlParams.get('txnId');
-    let appointment = null;
+   if (!txnId) {
+  document.body.innerHTML = "<h2>❌ Missing transaction ID.</h2>";
+} else {
+  const statusEl = document.getElementById('status');
+
+  async function checkStatus() {
     try {
-      appointment = JSON.parse(sessionStorage.getItem('pendingAppointment'));
-    } catch (e) {
-      appointment = null;
-    }
-    if (!txnId || !appointment) {
-      document.body.innerHTML = "<h2>❌ Missing payment or appointment details.</h2>";
-    } else {
-      const statusEl = document.getElementById('status');
+      const res = await fetch(
+        `https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`
+      );
+      const data = await res.json();
 
-      async function checkStatus() {
-        try {
-          // 1. Check payment status
-          const res = await fetch(`https://jainsewa-backend.onrender.com/api/payment/status?txnId=${txnId}`);
-          const data = await res.json();
+      if (data.code === "PAYMENT_SUCCESS") {
+        statusEl.innerText = "💜 Payment confirmed! Redirecting...";
 
-          if (data.code === "PAYMENT_SUCCESS") {
-            statusEl.innerText = "💜 Payment confirmed! Checking your appointment...";
-
-              sessionStorage.removeItem('pendingAppointment');
-              const query = `?success=1&name=${appointment.name}&mob=${appointment.mobile}&txnId=${txnId}`;
-              window.location.href = `p-dashboard.html${query}`;
-              
-            } 
-            else if (data.code === "PAYMENT_FAILED") {
-            document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
-          } 
-        } catch (err) {
-          console.error(err);
-          statusEl.innerText = "⚠️ Error checking payment status. Retrying...";
-          setTimeout(checkStatus, 3000);
-        }
+        // ✅ Redirect only with txnId
+        window.location.href = `patient-dashboard.html?success=1&txnId=${txnId}`;
+        return;
       }
 
-      // Start polling
-      checkStatus();
+      if (data.code === "PAYMENT_FAILED") {
+        document.body.innerHTML = `<h2>❌ Payment failed or was cancelled.</h2>`;
+        return;
+      }
+
+      // Still pending → poll again
+      setTimeout(checkStatus, 3000);
+
+    } catch (err) {
+      console.error(err);
+      statusEl.innerText = "⚠️ Error checking payment status. Retrying...";
+      setTimeout(checkStatus, 3000);
     }
+  }
+
+  checkStatus();
+}
+
   </script>
 </body>
 </html>
