@@ -1019,28 +1019,24 @@ localStorage.setItem("user", JSON.stringify(data));
   const user = JSON.parse(localStorage.getItem("user"));
   const notes = document.getElementById("payNotes").value || "";
   const amount = Number(feeAmount.innerText) || 59;
+
+  if (!appointmentFor) {
+    alert("Appointment selector not ready");
+    return;
+  }
+
   const selectedFor = appointmentFor.value;
 
   confirmPay.innerText = "Processing...";
   confirmPay.disabled = true;
 
   try {
-    // Ensure FAMILY_MEMBERS is ready
-    if (!Array.isArray(FAMILY_MEMBERS)) {
-      alert("Family data not ready yet. Please try again.");
-      confirmPay.disabled = false;
-      confirmPay.innerText = "Proceed to Pay";
-      return;
-    }
-
-    let patientData = null;
+    let patientData;
 
     if (selectedFor === "self") {
       patientData = {
         type: "self",
-        name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.mobile,
-        relation: null,
-        age: user.age || null,
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
         gender: user.gender || null,
         city: user.city || null,
         state: user.state || null,
@@ -1049,28 +1045,24 @@ localStorage.setItem("user", JSON.stringify(data));
     } else {
       const member = FAMILY_MEMBERS.find(m => m._id === selectedFor);
       if (!member) {
-        alert("Selected family member data not found.");
-        confirmPay.disabled = false;
-        confirmPay.innerText = "Proceed to Pay";
+        alert("Family member not found");
         return;
       }
+
       patientData = {
         type: "family",
-        name: member.name || "",
-        relation: member.relation || "",
-        age: member.age || null,
-        gender: member.gender || null,
-        city: member.city || null,
-        state: member.state || null,
-        disease: member.disease || null
+        name: member.name,
+        relation: member.relation,
+        age: member.age,
+        gender: member.gender,
+        city: member.city,
+        state: member.state,
+        disease: member.disease
       };
     }
 
-    // Now patientData must always have "type"
     if (!patientData || !patientData.type) {
-      alert("Invalid patient data. Please select a valid option.");
-      confirmPay.disabled = false;
-      confirmPay.innerText = "Proceed to Pay";
+      alert("Invalid patient data");
       return;
     }
 
@@ -1078,32 +1070,35 @@ localStorage.setItem("user", JSON.stringify(data));
       amount,
       email: user.email,
       mobile: user.mobile,
-      notes,
-      paymentMethod: "online",
       purpose: "Appointment Booking",
+      paymentMethod: "online",
+      notes,
       patient: patientData
     };
 
-    const res = await fetch("https://jainsewa-backend.onrender.com/api/payment/initiate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(paymentData)
-    });
+    console.log("PAYLOAD →", paymentData); // 👈 DEBUG
+
+    const res = await fetch(
+      "https://jainsewa-backend.onrender.com/api/payment/initiate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paymentData)
+      }
+    );
 
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.message || "Payment initiation failed");
-      console.error("Backend error:", data);
+      alert(data.message);
       return;
     }
 
-    if (data.redirectUrl) {
-      window.location.href = data.redirectUrl;
-    }
+    window.location.href = data.redirectUrl;
+
   } catch (err) {
     console.error(err);
-    alert("Server error while initiating payment.");
+    alert("Server error");
   } finally {
     confirmPay.innerText = "Proceed to Pay";
     confirmPay.disabled = false;
