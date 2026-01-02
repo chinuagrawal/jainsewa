@@ -941,7 +941,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadFamilyMembers();
   loadAppointments();
   attachEvents();
+
+  // ✅ SHOW CONFIRMATION MODAL IF PAYMENT RETURNED
+  const saved = sessionStorage.getItem("paymentSuccessData");
+  if (saved) {
+    const data = JSON.parse(saved);
+    showConfirmationModal({
+      name: data.name,
+      mob: data.mob,
+      txnId: data.txnId
+    });
+    sessionStorage.removeItem("paymentSuccessData");
+  }
 });
+
 
 /* =========================
    FETCH USER (ONCE)
@@ -1184,6 +1197,18 @@ async function initiatePayment() {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.message);
+    sessionStorage.setItem(
+  "paymentSuccessData",
+  JSON.stringify({
+    name:
+      appointmentFor.value === "self"
+        ? `${USER.firstName} ${USER.lastName}`
+        : document.getElementById("s_name").innerText,
+    mob: USER.mobile,
+    txnId: data.merchantTransactionId
+  })
+);
+
 
     window.location.href = data.redirectUrl;
   } catch (err) {
@@ -1203,6 +1228,35 @@ document.getElementById("editProfile").onclick = () =>
   window.location.href = "signup.html";
 document.getElementById("contactBtn").onclick = () =>
   window.location.href = "tel:8870969514";
+  function showConfirmationModal({ name, mob, txnId }) {
+  const modal = document.getElementById("confirmation-modal");
+  const details = document.getElementById("confirmation-details");
+  const closeBtn = document.getElementById("close-modal");
+
+  details.innerHTML = `
+    <h2>✅ अपॉइंटमेंट कन्फर्म हो गया!</h2>
+    <p>
+      प्रिय <strong>${name}</strong>,<br><br>
+
+      आपका अपॉइंटमेंट सफलतापूर्वक बुक हो गया है।<br><br>
+
+      📞 मोबाइल नंबर: <strong>${mob}</strong><br>
+      💳 ट्रांज़ैक्शन आईडी: <strong>${txnId}</strong><br><br>
+
+      👨‍⚕️ डॉक्टर आपसे शीघ्र ही संपर्क करेंगे।<br><br>
+
+      धन्यवाद, स्वस्थ रहें!
+    </p>
+  `;
+
+  modal.classList.remove("hidden");
+
+  closeBtn.onclick = () => {
+    modal.classList.add("hidden");
+    window.location.href = "patient-dashboard.html";
+  };
+}
+
 </script>
 
 </body>
