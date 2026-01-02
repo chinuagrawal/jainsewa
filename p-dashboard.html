@@ -905,6 +905,11 @@
     </div>
   </div>
 <script>
+  const API_BASE =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "https://jainsewa-backend.onrender.com";
 /* =========================
    GLOBAL STATE (ONE SOURCE)
 ========================= */
@@ -934,6 +939,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await fetchUser();
   loadFamilyMembers();
+  loadAppointments();
   attachEvents();
 });
 
@@ -942,7 +948,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 ========================= */
 async function fetchUser() {
   const res = await fetch(
-    `https://jainsewa-backend.onrender.com/api/user?mobile=${USER.mobile}`
+    `${API_BASE}/api/user?mobile=${USER.mobile}`
   );
   const data = await res.json();
 
@@ -956,6 +962,72 @@ async function fetchUser() {
   document.getElementById("avatar").innerText =
     (USER.firstName?.[0] || "P") + (USER.lastName?.[0] || "");
 }
+async function loadAppointments() {
+  const apptsDiv = document.getElementById("appts");
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/appointments?mobile=${USER.mobile}`
+    );
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      apptsDiv.innerHTML =
+        `<div style="color: var(--muted)">No upcoming appointments</div>`;
+      return;
+    }
+
+    apptsDiv.innerHTML = "";
+
+    data.forEach(appt => {
+  try {
+    const div = document.createElement("div");
+    div.className = "appt";
+
+    const patientName =
+      appt.patient?.name ||
+      appt.notes?.replace("Booking for", "").trim() ||
+      "Patient";
+
+    const createdAt = appt.createdAt
+      ? new Date(appt.createdAt).toLocaleString()
+      : "-";
+
+    const fee = appt.fee ?? 0;
+    const status = appt.status ?? "-";
+
+    div.innerHTML = `
+      <div>
+        <strong>${patientName}</strong>
+        ${
+          appt.patientType === "family"
+            ? `<small style="color:#6a1b9a"> (Family)</small>`
+            : ""
+        }
+        <div style="font-size:12px;color:#666">
+          ${createdAt}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div>₹${fee}</div>
+        <small>${status}</small>
+      </div>
+    `;
+
+    apptsDiv.appendChild(div);
+  } catch (e) {
+    console.error("❌ Appointment render failed:", appt, e);
+  }
+});
+
+
+  } catch (err) {
+    console.error("Error loading appointments:", err);
+    apptsDiv.innerHTML =
+      `<div style="color:red">Failed to load appointments</div>`;
+  }
+}
+
 
 /* =========================
    LOAD FAMILY MEMBERS
@@ -1102,7 +1174,7 @@ async function initiatePayment() {
 
   try {
     const res = await fetch(
-      "https://jainsewa-backend.onrender.com/api/payment/initiate",
+      "${API_BASE}/api/payment/initiate",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
