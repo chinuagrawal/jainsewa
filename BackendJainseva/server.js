@@ -47,11 +47,10 @@ app.use('/api', webhookRoutes);
 
 // GET /api/admin/appointments
 // Optional query: status, from=YYYY-MM-DD, to=YYYY-MM-DD, period=days, limit, skip
-app.get('/api/admin/appointments', async (req, res) => {
+app.get("/api/admin/appointments", async (req, res) => {
   try {
     const { status, from, to, period, limit = 200, skip = 0 } = req.query;
 
-    // Build match stage
     const match = {};
     if (status) match.status = status;
 
@@ -59,67 +58,52 @@ app.get('/api/admin/appointments', async (req, res) => {
     let startDate, endDate;
     if (period) {
       const now = new Date();
-      startDate = new Date(now.getTime() - Number(period) * 24 * 60 * 60 * 1000);
+      startDate = new Date(
+        now.getTime() - Number(period) * 24 * 60 * 60 * 1000
+      );
       endDate = now;
     } else {
       if (from) startDate = new Date(from);
       if (to) {
         endDate = new Date(to);
-        endDate.setHours(23,59,59,999);
+        endDate.setHours(23, 59, 59, 999);
       }
     }
+
     if (startDate || endDate) {
       match.createdAt = {};
       if (startDate) match.createdAt.$gte = startDate;
       if (endDate) match.createdAt.$lte = endDate;
     }
 
-    const pipeline = [
-  { $match: match },
-  { $sort: { createdAt: -1 } },
-  { $skip: Number(skip) },
-  { $limit: Math.min(1000, Number(limit)) },
-  {
-    $lookup: {
-      from: 'users',
-      localField: 'userMobile',
-      foreignField: 'mobile',
-      as: 'user'
-    }
-  },
-  { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
-  {
-    $addFields: {
-      patientName: {
-        $trim: {
-          input: {
-            $concat: [
-              { $ifNull: ['$user.firstName', ''] },
-              ' ',
-              { $ifNull: ['$user.lastName', ''] }
-            ]
-          }
-        }
-      },
-      patientEmail: { $ifNull: ['$user.email', null] },
-      patientGender: { $ifNull: ['$user.gender', null] },
-      patientDOB: { $ifNull: ['$user.dob', null] },
-      patientCity: { $ifNull: ['$user.city', null] },
-      patientState: { $ifNull: ['$user.state', null] },
-      patientDisease: { $ifNull: ['$user.disease', null] }
-    }
-  },
-  { $project: { user: 0 } }
-];
+    const appointments = await Appointment.find(match)
+      .sort({ createdAt: -1 })
+      .skip(Number(skip))
+      .limit(Math.min(1000, Number(limit)))
+      .lean();
 
-
-    const appointments = await Appointment.aggregate(pipeline);
     res.json(appointments);
   } catch (err) {
-    console.error('Error fetching admin appointments with patient names:', err);
-    res.status(500).json({ message: 'Error fetching appointments' });
+    console.error("Error fetching admin appointments:", err);
+    res.status(500).json({ message: "Error fetching appointments" });
   }
 });
+// GET single appointment by ID (Admin / Doctor)
+app.get("/api/admin/appointments/:id", async (req, res) => {
+  try {
+    const appt = await Appointment.findById(req.params.id).lean();
+
+    if (!appt) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.json(appt);
+  } catch (err) {
+    console.error("Error fetching appointment by id:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 // New test endpoint
 app.get('/api/test-route', (req, res) => {
@@ -132,50 +116,26 @@ app.get('/api/appointments/test', (req, res) => {
 
 
 // GET /api/appointments?mobile=9876543210[&status=confirmed][&from=YYYY-MM-DD&to=YYYY-MM-DD][&period=7][&limit=50&skip=0]
-app.get('/api/appointments', async (req, res) => {
+// GET /api/appointments?mobile=XXXXXXXXXX
+app.get("/api/appointments", async (req, res) => {
   try {
-    const { mobile, status, from, to, period, limit = 200, skip = 0 } = req.query;
-
-    // require mobile (dashboard depends on it)
+    const { mobile } = req.query;
     if (!mobile) {
-      return res.status(400).json({ message: "Missing 'mobile' query parameter" });
+      return res.status(400).json({ message: "Mobile required" });
     }
 
-    const filter = { userMobile: mobile };
-
-    // status filter (optional)
-    if (status) filter.status = status;
-
-    // date filtering (createdAt)
-    let startDate, endDate;
-    if (period) {
-      const now = new Date();
-      startDate = new Date(now.getTime() - Number(period) * 24 * 60 * 60 * 1000);
-      endDate = now;
-    } else {
-      if (from) startDate = new Date(from);
-      if (to) {
-        endDate = new Date(to);
-        endDate.setHours(23,59,59,999);
-      }
-    }
-    if (startDate || endDate) {
-      filter.createdAt = {};
-      if (startDate) filter.createdAt.$gte = startDate;
-      if (endDate) filter.createdAt.$lte = endDate;
-    }
-
-    const docs = await Appointment.find(filter)
+    const appointments = await Appointment.find({ userMobile: mobile })
       .sort({ createdAt: -1 })
-      .skip(Number(skip))
-      .limit(Math.min(1000, Number(limit)));
+      .limit(20)
+      .lean();
 
-    res.json(docs);
+    res.json(appointments);
   } catch (err) {
-    console.error('Error fetching appointments:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching user appointments:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 // GET /api/user?mobile=9876543210

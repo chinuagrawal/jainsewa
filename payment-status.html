@@ -66,7 +66,7 @@
 
               sessionStorage.removeItem('pendingAppointment');
               const query = `?success=1&name=${appointment.name}&mob=${appointment.mobile}&txnId=${txnId}`;
-              window.location.href = `patient-dashboard.html${query}`;
+              window.location.href = `p-dashboard.html${query}`;
               
             } 
             else if (data.code === "PAYMENT_FAILED") {

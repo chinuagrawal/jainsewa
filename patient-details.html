@@ -35,45 +35,104 @@ body{
 </div>
 
 <script>
-async function loadDetails(){
+async function loadDetails() {
+  const container = document.getElementById("app");
   const id = new URLSearchParams(location.search).get("id");
-  if(!id){
-    document.getElementById("app").innerText="No appointment selected";
+
+  if (!id) {
+    container.innerText = "No appointment selected";
     return;
   }
 
-  const res = await fetch(
-    `https://jainsewa-backend.onrender.com/api/admin/appointments?id=${id}`
-  );
-  const data = await res.json();
-  const appt = Array.isArray(data) ? data[0] : data;
-  if(!appt){
-    document.getElementById("app").innerText="Appointment not found";
-    return;
+  try {
+    const res = await fetch(
+      `https://jainsewa-backend.onrender.com/api/admin/appointments/${encodeURIComponent(id)}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Appointment not found");
+    }
+
+    const appt = await res.json();
+    const p = appt.patient || {};
+    const isFamily = appt.patientType === "family";
+
+    container.innerHTML = `
+      <h2>${p.name || "Unknown Patient"}</h2>
+
+      <div class="row">
+        <span class="label">Patient Type</span>
+        <span class="value">${isFamily ? "Family" : "Self"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Relation</span>
+        <span class="value">${p.relation || "Self"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Gender</span>
+        <span class="value">${p.gender || "-"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Age</span>
+        <span class="value">${p.age || "-"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">City</span>
+        <span class="value">${p.city || "-"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">State</span>
+        <span class="value">${p.state || "-"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Disease</span>
+        <span class="value">${p.disease || "-"}</span>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <span class="label">Doctor</span>
+        <span class="value">${appt.doctor || "General"}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Date</span>
+        <span class="value">${new Date(appt.createdAt).toLocaleString()}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Fee</span>
+        <span class="value">₹${appt.fee}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Transaction ID</span>
+        <span class="value">${appt.paymentTxnId}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Status</span>
+        <span class="tag">${appt.status}</span>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <span class="label">Booked By (Mobile)</span>
+        <span class="value">${appt.userMobile}</span>
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    container.innerText = "Error loading appointment details";
   }
-
-  const p = appt.patient || {};
-  const html = `
-    <h2>${p.name || "Unknown Patient"}</h2>
-    <div class="row"><span class="label">Relation</span><span class="value">${p.relation || "Self"}</span></div>
-    <div class="row"><span class="label">Gender</span><span class="value">${p.gender || "-"}</span></div>
-    <div class="row"><span class="label">Age</span><span class="value">${p.age || "-"}</span></div>
-    <div class="row"><span class="label">City</span><span class="value">${p.city || "-"}</span></div>
-    <div class="row"><span class="label">Disease</span><span class="value">${p.disease || "-"}</span></div>
-
-    <hr>
-
-    <div class="row"><span class="label">Doctor</span><span class="value">${appt.doctor}</span></div>
-    <div class="row"><span class="label">Date</span><span class="value">${new Date(appt.createdAt).toLocaleString()}</span></div>
-    <div class="row"><span class="label">Fee</span><span class="value">₹${appt.fee}</span></div>
-    <div class="row"><span class="label">Txn</span><span class="value">${appt.paymentTxnId}</span></div>
-    <div class="row"><span class="label">Status</span><span class="tag">${appt.status}</span></div>
-
-    <hr>
-    <div class="row"><span class="label">Booked By</span><span class="value">${appt.userMobile}</span></div>
-  `;
-
-  document.getElementById("app").innerHTML = html;
 }
 
 loadDetails();
