@@ -5,6 +5,11 @@ Template 2098 Health
 http://www.tooplate.com/view/2098-health
 
 */
+.about-hindi-text {
+  font-size: 20px;        /* increase text size */
+  line-height: 1.8;       /* better readability */
+  font-weight: 500;
+}
 
   @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600');
 
