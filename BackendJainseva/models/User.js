@@ -33,20 +33,11 @@ const userSchema = new mongoose.Schema(
     // ✅ Family members with FULL details
     familyMembers: [familyMemberSchema],
 
-    // ✅ Admin custom pricing
-    customPricing: {
-      am: Number,
-      pm: Number,
-      full: Number,
-      offers: [
-        {
-          duration: Number,
-          discount: Number
-        }
-      ],
-      paymentGatewayFeePercent: Number,
-      convenienceFee: Number
-    }
+    hasBookedAppointment: {
+  type: Boolean,
+  default: false
+}
+
   },
   { timestamps: true }
 );
