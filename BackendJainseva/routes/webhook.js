@@ -64,6 +64,12 @@ router.post("/phonepe/webhook", async (req, res) => {
     });
 
     await appointment.save();
+    // ✅ Mark user as having booked an appointment (prevents auto-delete)
+await User.updateOne(
+  { mobile: pending.mobile, role: "user" }, // safety: don't touch admins/doctors
+  { $set: { hasBookedAppointment: true } }
+);
+
     await PendingAppointment.deleteOne({ _id: pending._id });
 
     console.log(

@@ -7,6 +7,8 @@ const axios = require('axios');
 require('dotenv').config();
 const router = express.Router();
 const app = express();
+// Simple test route to check server
+const cron = require("node-cron");
 app.get("/", (req, res) => res.send("Server is running"));
 const PORT = process.env.PORT || 3000;
 
@@ -478,7 +480,26 @@ app.get('/api/family/:mobile', async (req, res) => {
 
 
 
-// Simple test route to check server
+
+
+// ⏱ Runs every 5 minutes
+cron.schedule("*/5 * * * *", async () => {
+  try {
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+
+    const result = await User.deleteMany({
+      role: "user",                      // ❌ not admin/doctor
+      hasBookedAppointment: false,       // ❌ no appointment
+      createdAt: { $lte: fifteenMinutesAgo }
+    });
+
+    if (result.deletedCount > 0) {
+      console.log(`🗑 Deleted ${result.deletedCount} inactive users`);
+    }
+  } catch (err) {
+    console.error("❌ Auto user cleanup error:", err.message);
+  }
+});
 
 
 
