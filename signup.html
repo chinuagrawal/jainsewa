@@ -158,7 +158,7 @@ const dob = `${year}-${month}-${day}`;
        const data = await res.json();
 
         if (res.ok) {
-          alert("पंजीकरण सफल! आप लॉगिन हो चुके हैं।");
+          
 
           // ✅ Auto login: store user in localStorage
           localStorage.setItem("user", JSON.stringify(data.user));

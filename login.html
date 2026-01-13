@@ -99,7 +99,7 @@ const dob = `${year}-${month}-${day}`;
         const data = await res.json();
 
         if (res.ok) {
-          alert("Login successful!");
+          
           localStorage.setItem("user", JSON.stringify(data.user));
           if (data.user.role === "doctor") {
             window.location.href = "doctorPanel.html";
