@@ -413,6 +413,51 @@ http://www.tooplate.com/view/2098-health
 .phone-icon.flashy {
   font-size: 17px;
 }
+.existing-login-box {
+  margin-top: 20px;
+  text-align: center;
+  padding: 0 10px; /* mobile safe padding */
+}
+
+.existing-hint-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ff4444;
+  margin-bottom: 12px;
+  line-height: 1.4; /* better spacing on mobile */
+  animation: blinkHint 1s infinite;
+  word-break: break-word; /* prevents text overflow */
+}
+
+@keyframes blinkHint {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ✅ Mobile friendly + rectangle button */
+.existing-login-btn {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 6px; /* rectangle like appointment button */
+  text-align: center;
+}
+
+/* ✅ Extra responsive for small mobiles */
+@media (max-width: 480px) {
+  .existing-hint-text {
+    font-size: 13px;
+  }
+
+  .existing-login-btn {
+    font-size: 15px;
+    padding: 13px 0;
+  }
+}
+
 
 .phone-icon.flashy .phone-link {
   color: yellow;               /* default */

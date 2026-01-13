@@ -29,7 +29,7 @@ http://www.tooplate.com/view/2098-health
 
 
   <!-- MAIN CSS -->
-  <link rel="stylesheet" href="css/tooplate-style.css?v=1.0.6">
+  <link rel="stylesheet" href="css/tooplate-style.css?v=1.0.7">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -108,6 +108,7 @@ http://www.tooplate.com/view/2098-health
           <li class="appointment-btn"><a href="./signup.html">Make an appointment</a></li>
         </ul>
       </div>
+      
 
     </div>
   </section>
@@ -277,12 +278,39 @@ http://www.tooplate.com/view/2098-health
           </div>
         </form>
       </div>
-
-    </div>
+      </div>
+      <div class="existing-login-box wow fadeInUp" data-wow-delay="1s">
+    <p id="existingHintText" class="existing-hint-text">
+      Existing patients can login with this button and book appointment for self and family members 👇
+    </p>
+  
+    <a href="./login.html" class="btn btn-danger existing-login-btn">
+     Patient Login
+    </a>
   </div>
+      
+      
+      
 </section>
+<script>
+  const hintEl = document.getElementById("existingHintText");
+
+  const hints = [
+    "Existing patients can login with this button and book appointment for self and family members 👇",
+    "पुराने मरीज इस बटन से लॉगिन करके स्वयं एवं परिवार के सदस्यों के लिए अपॉइंटमेंट बुक कर सकते हैं 👇"
+  ];
+
+  let i = 0;
+
+  setInterval(() => {
+    i = (i + 1) % hints.length;
+    hintEl.textContent = hints[i];
+  }, 4000);
+</script>
+
 
 <script>
+  
 document.getElementById("appointment-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
