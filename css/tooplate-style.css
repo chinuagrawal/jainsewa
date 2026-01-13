@@ -410,6 +410,19 @@ http://www.tooplate.com/view/2098-health
   }
 
 
+.phone-icon.flashy,
+.phone-icon.flashy .phone-link {
+  color: yellow;               /* default */
+  font-weight: bold;
+  text-decoration: none;
+  animation: phoneFlash 1s infinite;
+}
+
+@keyframes phoneFlash {
+  0%   { color: yellow; }
+  50%  { color: red; }
+  100% { color: yellow; }
+}
 
   /*---------------------------------------
       HOME              
