@@ -410,7 +410,10 @@ http://www.tooplate.com/view/2098-health
   }
 
 
-.phone-icon.flashy,
+.phone-icon.flashy {
+  font-size: 17px;
+}
+
 .phone-icon.flashy .phone-link {
   color: yellow;               /* default */
   font-weight: bold;
