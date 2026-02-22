@@ -612,28 +612,57 @@ header span i {
   width: max-content;
 }
 
-.disease-pill {
-  background: #ffffff;
-  border-radius: 999px;
-  padding: 10px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid #ececec;
+.disease-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  min-width: 230px;
+  max-width: 260px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.disease-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.7);
+  transform: scale(1.03);
+  transition:
+    transform 0.6s ease,
+    filter 0.6s ease;
+}
+
+.disease-overlay {
+  position: absolute;
+  inset: 0;
   display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  white-space: nowrap;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px 14px;
+  color: #ffffff;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.02)
+  );
+}
+
+.disease-title-en {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.disease-title-hi {
   font-size: 16px;
+  margin-top: 4px;
 }
 
-.disease-name-en {
-  font-weight: 600;
-  margin-right: 6px;
-  color: #252525;
-}
-
-.disease-name-hi {
-  color: #555555;
-  font-size: 15px;
+.disease-card:hover img {
+  filter: brightness(0.7);
+  transform: scale(1.07);
 }
 
 .disease-section:hover .disease-track {
@@ -1162,15 +1191,6 @@ footer a:hover {
     padding-top: 60px;
     padding-bottom: 60px;
   }
-
-  .disease-pill {
-    padding: 9px 18px;
-    font-size: 15px;
-  }
-
-  .disease-name-hi {
-    font-size: 14px;
-  }
 }
 
 @media only screen and (max-width: 767px) {
@@ -1329,4 +1349,18 @@ footer a:hover {
   .disease-subtitle {
     font-size: 13px;
   }
+
+  .disease-card {
+    min-width: 200px;
+    max-width: 220px;
+  }
+
+  .disease-title-en {
+    font-size: 18px;
+  }
+
+  .disease-title-hi {
+    font-size: 14px;
+  }
+}
 }
