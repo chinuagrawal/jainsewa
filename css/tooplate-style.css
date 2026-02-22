@@ -622,7 +622,7 @@ header span i {
   flex-wrap: nowrap;
   align-items: center;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .disease-name-en {
@@ -633,7 +633,7 @@ header span i {
 
 .disease-name-hi {
   color: #555555;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .disease-section:hover .disease-track {
@@ -1164,12 +1164,12 @@ footer a:hover {
   }
 
   .disease-pill {
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: 9px 18px;
+    font-size: 15px;
   }
 
   .disease-name-hi {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
