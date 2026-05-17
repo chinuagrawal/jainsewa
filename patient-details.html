@@ -5,33 +5,181 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Patient Details</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
-  font-family:Inter,system-ui;
-  background:#f4f6fb;
-  padding:20px;
+:root {
+  --primary: #4a148c;
+  --primary-light: #7c43bd;
+  --bg: #f8f9fe;
+  --text: #2d3436;
+  --text-light: #636e72;
+  --white: #ffffff;
+  --shadow: 0 10px 30px rgba(74, 20, 140, 0.08);
+  --radius: 16px;
 }
-.card{
-  max-width:900px;
-  margin:auto;
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 20px;
 }
-.row{display:flex;justify-content:space-between;margin-bottom:8px}
-.label{color:#666;font-weight:600}
-.value{font-weight:700}
-.tag{padding:6px 10px;border-radius:8px;background:#eee;font-weight:700}
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.back-btn {
+  background: var(--white);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  transform: translateX(-3px);
+  background: var(--primary);
+  color: var(--white);
+}
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 30px;
+  color: var(--white);
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.card-body {
+  padding: 30px;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.info-box {
+  background: #fcfcfd;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f5;
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.value {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.tag.pending { background: #fff3e0; color: #ef6c00; }
+.tag.confirmed { background: #e8f5e9; color: #2e7d32; }
+.tag.cancelled { background: #ffeeb2; color: #c62828; }
+
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
+
+@media (max-width: 600px) {
+  body { padding: 15px; }
+  .card-header, .card-body { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 
 <body>
 
-<div class="card" id="app">
-  Loading patient details...
+<div class="container">
+  <div class="header">
+    <a href="javascript:history.back()" class="back-btn"><i class="ri-arrow-left-line"></i></a>
+    <h1 style="margin:0; font-size: 20px; font-weight: 700; color: var(--primary);">Appointment Details</h1>
+  </div>
+
+  <div class="card" id="app">
+    <div style="padding: 40px; text-align: center; color: var(--text-light);">
+      <i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i>
+      <p>Loading patient details...</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -40,7 +188,7 @@ async function loadDetails() {
   const id = new URLSearchParams(location.search).get("id");
 
   if (!id) {
-    container.innerText = "No appointment selected";
+    container.innerHTML = '<div style="padding:40px; text-align:center;">No appointment selected</div>';
     return;
   }
 
@@ -58,85 +206,99 @@ async function loadDetails() {
     const isFamily = appt.patientType === "family";
 
     container.innerHTML = `
-      <h2>${p.name || "Unknown Patient"}</h2>
-
-      <div class="row">
-        <span class="label">Patient Type</span>
-        <span class="value">${isFamily ? "Family" : "Self"}</span>
+      <div class="card-header">
+        <h2>${p.name || "Unknown Patient"}</h2>
+        <div style="margin-top:8px; font-size: 14px; opacity: 0.9;">
+          <i class="ri-calendar-event-line"></i> ${new Date(appt.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </div>
       </div>
 
-      <div class="row">
-        <span class="label">Relation</span>
-        <span class="value">${p.relation || "Self"}</span>
-      </div>
+      <div class="card-body">
+        <div class="section">
+          <div class="section-title"><i class="ri-user-heart-line"></i> Patient Information</div>
+          <div class="grid">
+            <div class="info-box">
+              <span class="label">Patient Type</span>
+              <span class="value">${isFamily ? "Family Member" : "Self"}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Relation</span>
+              <span class="value">${p.relation || "Self"}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Gender</span>
+              <span class="value" style="text-transform: capitalize;">${p.gender || "-"}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Age</span>
+              <span class="value">${p.age || "-"} years</span>
+            </div>
+          </div>
+        </div>
 
-      <div class="row">
-        <span class="label">Gender</span>
-        <span class="value">${p.gender || "-"}</span>
-      </div>
+        <div class="section">
+          <div class="section-title"><i class="ri-map-pin-line"></i> Location & Medical</div>
+          <div class="grid">
+            <div class="info-box">
+              <span class="label">City / State</span>
+              <span class="value">${p.city || "-"}, ${p.state || "-"}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Disease</span>
+              <span class="value">${p.disease || "-"}</span>
+            </div>
+            <div class="info-box" style="grid-column: span 1;">
+              <span class="label">Registration Center</span>
+              <span class="value">${p.registrationCenter || "-"}</span>
+            </div>
+          </div>
+        </div>
 
-      <div class="row">
-        <span class="label">Age</span>
-        <span class="value">${p.age || "-"}</span>
-      </div>
+        <div class="section">
+          <div class="section-title"><i class="ri-stethoscope-line"></i> Appointment & Billing</div>
+          <div class="grid">
+            <div class="info-box">
+              <span class="label">Doctor</span>
+              <span class="value">${appt.doctor || "General"}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Fee Paid</span>
+              <span class="value" style="color: #2e7d32;">₹${appt.fee}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Status</span>
+              <span class="tag ${appt.status}">${appt.status}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Time</span>
+              <span class="value">${new Date(appt.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          </div>
+        </div>
 
-      <div class="row">
-        <span class="label">City</span>
-        <span class="value">${p.city || "-"}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">State</span>
-        <span class="value">${p.state || "-"}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">Disease</span>
-        <span class="value">${p.disease || "-"}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">Registration Center</span>
-        <span class="value">${p.registrationCenter || "-"}</span>
-      </div>
-
-      <hr>
-
-      <div class="row">
-        <span class="label">Doctor</span>
-        <span class="value">${appt.doctor || "General"}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">Date</span>
-        <span class="value">${new Date(appt.createdAt).toLocaleString()}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">Fee</span>
-        <span class="value">₹${appt.fee}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">Transaction ID</span>
-        <span class="value">${appt.paymentTxnId}</span>
-      </div>
-
-      <div class="row">
-        <span class="label">Status</span>
-        <span class="tag">${appt.status}</span>
-      </div>
-
-      <hr>
-
-      <div class="row">
-        <span class="label">Booked By (Mobile)</span>
-        <span class="value">${appt.userMobile}</span>
+        <div class="section" style="margin-bottom:0;">
+          <div class="section-title"><i class="ri-secure-payment-line"></i> Transaction Details</div>
+          <div class="grid">
+            <div class="info-box">
+              <span class="label">Transaction ID</span>
+              <span class="value" style="font-family: monospace; font-size: 13px;">${appt.paymentTxnId}</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Booked By (Mobile)</span>
+              <span class="value">${appt.userMobile}</span>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   } catch (err) {
     console.error(err);
-    container.innerText = "Error loading appointment details";
+    container.innerHTML = `
+      <div style="padding: 40px; text-align: center; color: #c62828;">
+        <i class="ri-error-warning-line" style="font-size: 32px;"></i>
+        <p>Error loading appointment details. Please try again.</p>
+      </div>
+    `;
   }
 }
 
