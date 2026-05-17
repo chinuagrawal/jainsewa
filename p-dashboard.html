@@ -1172,10 +1172,24 @@
 
         let patient;
 
+        const calculateAge = (dobString) => {
+          if (!dobString) return null;
+          const today = new Date();
+          const birthDate = new Date(dobString);
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          return age;
+        };
+
         if (appointmentFor.value === "self") {
           patient = {
             type: "self",
             name: `${USER.firstName} ${USER.lastName}`,
+            age: calculateAge(USER.dob),
+            dob: USER.dob,
             gender: USER.gender,
             city: USER.city,
             state: USER.state,
@@ -1195,6 +1209,7 @@
             name: m.name,
             relation: m.relation,
             age: m.age,
+            dob: m.dob,
             gender: m.gender,
             city: m.city,
             state: m.state,

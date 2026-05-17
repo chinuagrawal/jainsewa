@@ -5,12 +5,13 @@ const familyMemberSchema = new mongoose.Schema(
     name: { type: String, required: true },
     relation: { type: String, required: true },
     age: { type: Number, required: true },
+    dob: { type: String },
     gender: { type: String, required: true },
     city: { type: String },
     state: { type: String },
-    disease: { type: String }
+    disease: { type: String },
   },
-  { _id: true }
+  { _id: true },
 );
 
 const userSchema = new mongoose.Schema(
@@ -35,12 +36,11 @@ const userSchema = new mongoose.Schema(
     familyMembers: [familyMemberSchema],
 
     hasBookedAppointment: {
-  type: Boolean,
-  default: false
-}
-
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("User", userSchema);

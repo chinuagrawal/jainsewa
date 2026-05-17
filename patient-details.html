@@ -1,215 +1,292 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Patient Details</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Patient Details</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
 
-<style>
-:root {
-  --primary: #4a148c;
-  --primary-light: #7c43bd;
-  --bg: #f8f9fe;
-  --text: #2d3436;
-  --text-light: #636e72;
-  --white: #ffffff;
-  --shadow: 0 10px 30px rgba(74, 20, 140, 0.08);
-  --radius: 16px;
-}
+    <style>
+      :root {
+        --primary: #4a148c;
+        --primary-light: #7c43bd;
+        --bg: #f8f9fe;
+        --text: #2d3436;
+        --text-light: #636e72;
+        --white: #ffffff;
+        --shadow: 0 10px 30px rgba(74, 20, 140, 0.08);
+        --radius: 16px;
+      }
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  padding: 20px;
-}
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        padding: 20px;
+      }
 
-.container {
-  max-width: 800px;
-  margin: 40px auto;
-}
+      .container {
+        max-width: 800px;
+        margin: 40px auto;
+      }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 30px;
-}
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
 
-.back-btn {
-  background: var(--white);
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  color: var(--primary);
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
+      .back-btn {
+        background: var(--white);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        color: var(--primary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
 
-.back-btn:hover {
-  transform: translateX(-3px);
-  background: var(--primary);
-  color: var(--white);
-}
+      .back-btn:hover {
+        transform: translateX(-3px);
+        background: var(--primary);
+        color: var(--white);
+      }
 
-.card {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  animation: fadeIn 0.5s ease;
-}
+      .card {
+        background: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        animation: fadeIn 0.5s ease;
+      }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-.card-header {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  padding: 30px;
-  color: var(--white);
-}
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        padding: 30px;
+        color: var(--white);
+      }
 
-.card-header h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-}
+      .card-header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+      }
 
-.card-body {
-  padding: 30px;
-}
+      .card-body {
+        padding: 30px;
+      }
 
-.section {
-  margin-bottom: 30px;
-}
+      .section {
+        margin-bottom: 30px;
+      }
 
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
-}
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
 
-.info-box {
-  background: #fcfcfd;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #f0f0f5;
-}
+      .info-box {
+        background: #fcfcfd;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #f0f0f5;
+      }
 
-.label {
-  display: block;
-  font-size: 12px;
-  color: var(--text-light);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
+      .label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-light);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
 
-.value {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-}
+      .value {
+        display: block;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+      }
 
-.tag {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: #e8f5e9;
-  color: #2e7d32;
-}
+      .tag {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
 
-.tag.pending { background: #fff3e0; color: #ef6c00; }
-.tag.confirmed { background: #e8f5e9; color: #2e7d32; }
-.tag.cancelled { background: #ffeeb2; color: #c62828; }
+      .tag.pending {
+        background: #fff3e0;
+        color: #ef6c00;
+      }
+      .tag.confirmed {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .tag.cancelled {
+        background: #ffeeb2;
+        color: #c62828;
+      }
 
-hr {
-  border: 0;
-  border-top: 1px solid #eee;
-  margin: 20px 0;
-}
+      hr {
+        border: 0;
+        border-top: 1px solid #eee;
+        margin: 20px 0;
+      }
 
-@media (max-width: 600px) {
-  body { padding: 15px; }
-  .card-header, .card-body { padding: 20px; }
-  .grid { grid-template-columns: 1fr; }
-}
-</style>
-</head>
+      @media (max-width: 600px) {
+        body {
+          padding: 15px;
+        }
+        .card-header,
+        .card-body {
+          padding: 20px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
 
-<body>
+  <body>
+    <div class="container">
+      <div class="header">
+        <a href="javascript:history.back()" class="back-btn"
+          ><i class="ri-arrow-left-line"></i
+        ></a>
+        <h1
+          style="
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+          "
+        >
+          Appointment Details
+        </h1>
+      </div>
 
-<div class="container">
-  <div class="header">
-    <a href="javascript:history.back()" class="back-btn"><i class="ri-arrow-left-line"></i></a>
-    <h1 style="margin:0; font-size: 20px; font-weight: 700; color: var(--primary);">Appointment Details</h1>
-  </div>
-
-  <div class="card" id="app">
-    <div style="padding: 40px; text-align: center; color: var(--text-light);">
-      <i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i>
-      <p>Loading patient details...</p>
+      <div class="card" id="app">
+        <div
+          style="padding: 40px; text-align: center; color: var(--text-light)"
+        >
+          <i class="ri-loader-4-line ri-spin" style="font-size: 24px"></i>
+          <p>Loading patient details...</p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<script>
-async function loadDetails() {
-  const container = document.getElementById("app");
-  const id = new URLSearchParams(location.search).get("id");
+    <script>
+      async function loadDetails() {
+        const container = document.getElementById("app");
+        const id = new URLSearchParams(location.search).get("id");
 
-  if (!id) {
-    container.innerHTML = '<div style="padding:40px; text-align:center;">No appointment selected</div>';
-    return;
-  }
+        if (!id) {
+          container.innerHTML =
+            '<div style="padding:40px; text-align:center;">No appointment selected</div>';
+          return;
+        }
 
-  try {
-    const res = await fetch(
-      `https://jainsewa-backend.onrender.com/api/admin/appointments/${encodeURIComponent(id)}`
-    );
+        try {
+          const res = await fetch(
+            `https://jainsewa-backend.onrender.com/api/admin/appointments/${encodeURIComponent(id)}`,
+          );
 
-    if (!res.ok) {
-      throw new Error("Appointment not found");
-    }
+          if (!res.ok) {
+            throw new Error("Appointment not found");
+          }
 
-    const appt = await res.json();
-    const p = appt.patient || {};
-    const isFamily = appt.patientType === "family";
+          const appt = await res.json();
+          const p = appt.patient || {};
+          const isFamily = appt.patientType === "family";
 
-    container.innerHTML = `
+          const calculateAge = (dobString) => {
+            if (!dobString) return null;
+            const birthDate = new Date(dobString);
+            if (isNaN(birthDate)) return null;
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            return age;
+          };
+
+          let displayAge = p.age || calculateAge(p.dob);
+
+          // ✅ Fallback for "Self" appointments if age/dob is missing in snapshot
+          if (!displayAge && !isFamily && appt.userMobile) {
+            try {
+              const userRes = await fetch(
+                `https://jainsewa-backend.onrender.com/api/user?mobile=${appt.userMobile}`,
+              );
+              if (userRes.ok) {
+                const userData = await userRes.json();
+                if (userData.dob) {
+                  displayAge = calculateAge(userData.dob);
+                }
+              }
+            } catch (e) {
+              console.warn("Failed to fetch user fallback dob", e);
+            }
+          }
+
+          container.innerHTML = `
       <div class="card-header">
         <h2>${p.name || "Unknown Patient"}</h2>
         <div style="margin-top:8px; font-size: 14px; opacity: 0.9;">
-          <i class="ri-calendar-event-line"></i> ${new Date(appt.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+          <i class="ri-calendar-event-line"></i> ${new Date(appt.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
         </div>
       </div>
 
@@ -231,7 +308,7 @@ async function loadDetails() {
             </div>
             <div class="info-box">
               <span class="label">Age</span>
-              <span class="value">${p.age || "-"} years</span>
+              <span class="value">${displayAge ? displayAge + " years" : "-"}</span>
             </div>
           </div>
         </div>
@@ -271,7 +348,7 @@ async function loadDetails() {
             </div>
             <div class="info-box">
               <span class="label">Time</span>
-              <span class="value">${new Date(appt.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span class="value">${new Date(appt.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
             </div>
           </div>
         </div>
@@ -291,19 +368,18 @@ async function loadDetails() {
         </div>
       </div>
     `;
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = `
+        } catch (err) {
+          console.error(err);
+          container.innerHTML = `
       <div style="padding: 40px; text-align: center; color: #c62828;">
         <i class="ri-error-warning-line" style="font-size: 32px;"></i>
         <p>Error loading appointment details. Please try again.</p>
       </div>
     `;
-  }
-}
+        }
+      }
 
-loadDetails();
-</script>
-
-</body>
+      loadDetails();
+    </script>
+  </body>
 </html>

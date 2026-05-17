@@ -14,25 +14,23 @@ const PendingAppointmentSchema = new mongoose.Schema({
     type: {
       type: String,
       enum: ["self", "family"],
-      required: true
+      required: true,
     },
     name: { type: String, required: true },
     relation: String,
     age: Number,
+    dob: String,
     gender: String,
     city: String,
     state: String,
     disease: String,
-    registrationCenter: String
+    registrationCenter: String,
   },
 
   doctor: String,
   date: Date,
 
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model(
-  "PendingAppointment",
-  PendingAppointmentSchema
-);
+module.exports = mongoose.model("PendingAppointment", PendingAppointmentSchema);

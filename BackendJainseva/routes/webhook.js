@@ -17,18 +17,33 @@ router.post("/phonepe/webhook", async (req, res) => {
     }
 
     const existing = await Appointment.findOne({
-      paymentTxnId: merchantOrderId
+      paymentTxnId: merchantOrderId,
     });
     if (existing) return res.status(200).send("OK");
 
     const pending = await PendingAppointment.findOne({
-      txnId: merchantOrderId
+      txnId: merchantOrderId,
     });
     if (!pending) return res.status(200).send("OK");
 
     // ✅ USE SNAPSHOT ONLY
     const patient = pending.patient || {};
     const patientType = patient.type || "self";
+
+    // ✅ FALLBACK: Calculate age for "self" if missing
+    if (patientType === "self" && !patient.age) {
+      const user = await User.findOne({ mobile: pending.mobile });
+      if (user && user.dob) {
+        const birthDate = new Date(user.dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        patient.age = age;
+      }
+    }
 
     const phonepeTxn = paymentDetails?.[0]?.transactionId || null;
     const paymentMode = paymentDetails?.[0]?.paymentMode || "UNKNOWN";
@@ -44,6 +59,7 @@ router.post("/phonepe/webhook", async (req, res) => {
         name: patient.name,
         relation: patient.relation || null,
         age: patient.age || null,
+        dob: patient.dob || null,
         gender: patient.gender || null,
         city: patient.city || null,
         state: patient.state || null,
@@ -61,20 +77,20 @@ router.post("/phonepe/webhook", async (req, res) => {
       paymentMode,
       paymentConfirmedVia: "webhook",
 
-      status: "confirmed"
+      status: "confirmed",
     });
 
     await appointment.save();
     // ✅ Mark user as having booked an appointment (prevents auto-delete)
-await User.updateOne(
-  { mobile: pending.mobile, role: "user" }, // safety: don't touch admins/doctors
-  { $set: { hasBookedAppointment: true } }
-);
+    await User.updateOne(
+      { mobile: pending.mobile, role: "user" }, // safety: don't touch admins/doctors
+      { $set: { hasBookedAppointment: true } },
+    );
 
     await PendingAppointment.deleteOne({ _id: pending._id });
 
     console.log(
-      `✅ Appointment confirmed for ${patient.name} | Mobile: ${pending.mobile}`
+      `✅ Appointment confirmed for ${patient.name} | Mobile: ${pending.mobile}`,
     );
 
     return res.status(200).send("OK");
@@ -83,6 +99,5 @@ await User.updateOne(
     return res.status(200).send("OK");
   }
 });
-
 
 module.exports = router;
