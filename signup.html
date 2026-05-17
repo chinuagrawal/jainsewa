@@ -1,194 +1,275 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#4a148c">
+  <head>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4a148c" />
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up Form</title>
-  <link rel="stylesheet" href="./login.css" />
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up Form</title>
+    <link rel="stylesheet" href="./login.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  </head>
 
-</head>
+  <body>
+    <div class="login">
+      <img src="images/bg.jpg" alt="signup image" class="login__img" />
 
-<body>
-  <div class="login">
-    <img src="images/bg.jpg" alt="signup image" class="login__img" />
+      <form id="signup-form" class="login__form">
+        <h1 class="login__title">Registration Form (पंजीकरण फॉर्म)</h1>
 
-    <form id="signup-form" class="login__form">
-      <h1 class="login__title">Registration Form (पंजीकरण फॉर्म)</h1>
+        <div class="login__content">
+          <!-- First Name -->
+          <div class="login__box">
+            <i class="ri-user-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="first-name"
+                required
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label">First Name / पहला नाम</label>
+            </div>
+          </div>
 
-      <div class="login__content">
+          <!-- Last Name -->
+          <div class="login__box">
+            <i class="ri-user-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="last-name"
+                required
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label">Last Name / अंतिम नाम</label>
+            </div>
+          </div>
 
-        <!-- First Name -->
-        <div class="login__box">
-          <i class="ri-user-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="text" id="first-name" required class="login__input" placeholder="">
-            <label class="login__label">First Name / पहला नाम</label>
+          <!-- Email (Optional) -->
+          <div class="login__box">
+            <i class="ri-mail-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="email"
+                id="email"
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label">Email / ईमेल (optional)</label>
+            </div>
+          </div>
+
+          <!-- DOB -->
+          <div class="login__box">
+            <i class="ri-calendar-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="dob"
+                required
+                class="login__input"
+                placeholder=""
+                readonly
+              />
+              <label class="login__label">Date of Birth / जन्म तिथि</label>
+            </div>
+          </div>
+
+          <!-- Gender -->
+          <div class="login__box">
+            <i class="ri-user-line login__icon"></i>
+            <div class="login__box-input">
+              <select id="gender" class="login__input" required>
+                <option value="" disabled selected hidden>
+                  Select Gender / लिंग
+                </option>
+                <option value="male">Male (पुरुष)</option>
+                <option value="female">Female (महिला)</option>
+                <option value="other">Other (अन्य)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- City -->
+          <div class="login__box">
+            <i class="ri-building-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="city"
+                required
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label">City / शहर</label>
+            </div>
+          </div>
+
+          <!-- State -->
+          <div class="login__box">
+            <i class="ri-map-pin-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="state"
+                required
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label">State / राज्य</label>
+            </div>
+          </div>
+
+          <!-- Disease -->
+          <div class="login__box">
+            <i class="ri-hospital-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="disease"
+                required
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label">Disease / बीमारी</label>
+            </div>
+          </div>
+
+          <!-- Registration Center -->
+          <div class="login__box">
+            <i class="ri-building-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="registration-center"
+                class="login__input"
+                placeholder=""
+              />
+              <label class="login__label"
+                >पंजीकरण केंद्र (optional)</label
+              >
+            </div>
+          </div>
+
+          <!-- Mobile Number -->
+          <div class="login__box">
+            <i class="ri-phone-line login__icon"></i>
+            <div class="login__box-input">
+              <input
+                type="tel"
+                id="mobile"
+                required
+                class="login__input"
+                placeholder=""
+                pattern="[0-9]{10}"
+              />
+              <label class="login__label">Mobile Number / मोबाइल नंबर</label>
+            </div>
           </div>
         </div>
 
-        <!-- Last Name -->
-        <div class="login__box">
-          <i class="ri-user-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="text" id="last-name" required class="login__input" placeholder="">
-            <label class="login__label">Last Name / अंतिम नाम</label>
-          </div>
-        </div>
+        <button type="submit" class="login__button">
+          Sign Up / साइन अप करें
+        </button>
 
-        <!-- Email (Optional) -->
-        <div class="login__box">
-          <i class="ri-mail-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="email" id="email" class="login__input" placeholder="">
-            <label class="login__label">Email / ईमेल (optional)</label>
-          </div>
-        </div>
+        <p class="login__register">
+          Already have an account?(क्या आपके पास पहले से खाता है?) <br /><a
+            href="login.html"
+            >Login (लॉगिन करें)</a
+          >
+        </p>
+      </form>
+    </div>
 
-        <!-- DOB -->
-        <div class="login__box">
-          <i class="ri-calendar-line login__icon"></i>
-          <div class="login__box-input">
-            <input
-  type="text"
-  id="dob"
-  required
-  class="login__input"
-  placeholder=""
-  readonly
->
-<label class="login__label">Date of Birth / जन्म तिथि</label>
+    <!-- Submit Form to Backend -->
+    <script>
+      document
+        .getElementById("signup-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
 
-            
-          </div>
-        </div>
+          const firstName = document.getElementById("first-name").value;
+          const lastName = document.getElementById("last-name").value;
+          const email = document.getElementById("email").value || null;
+          const dobInput = document.getElementById("dob").value;
 
-        <!-- Gender -->
-        <div class="login__box">
-          <i class="ri-user-line login__icon"></i>
-          <div class="login__box-input">
-            <select id="gender" class="login__input" required>
-              <option value="" disabled selected hidden>Select Gender / लिंग</option>
-              <option value="male">Male (पुरुष)</option>
-              <option value="female">Female (महिला)</option>
-              <option value="other">Other (अन्य)</option>
-            </select>
-          </div>
-        </div>
+          // convert 25-07-1999 → 1999-07-25
+          const [day, month, year] = dobInput.split("-");
+          const dob = `${year}-${month}-${day}`;
+          const gender = document.getElementById("gender").value;
+          const city = document.getElementById("city").value;
+          const state = document.getElementById("state").value;
+          const disease = document.getElementById("disease").value;
+          const registrationCenter =
+            document.getElementById("registration-center").value || null;
+          const mobile = document.getElementById("mobile").value;
 
-        <!-- City -->
-        <div class="login__box">
-          <i class="ri-building-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="text" id="city" required class="login__input" placeholder="">
-            <label class="login__label">City / शहर</label>
-          </div>
-        </div>
+          // use DOB as password
+          const password = dob;
 
-        <!-- State -->
-        <div class="login__box">
-          <i class="ri-map-pin-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="text" id="state" required class="login__input" placeholder="">
-            <label class="login__label">State / राज्य</label>
-          </div>
-        </div>
+          try {
+            const res = await fetch(
+              "https://jainsewa-backend.onrender.com/api/signup",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  firstName,
+                  lastName,
+                  email,
+                  dob,
+                  gender,
+                  city,
+                  state,
+                  disease,
+                  registrationCenter,
+                  mobile,
+                  password,
+                }),
+              },
+            );
 
-        <!-- Disease -->
-        <div class="login__box">
-          <i class="ri-hospital-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="text" id="disease" required class="login__input" placeholder="">
-            <label class="login__label">Disease / बीमारी</label>
-          </div>
-        </div>
+            const data = await res.json();
 
-        <!-- Mobile Number -->
-        <div class="login__box">
-          <i class="ri-phone-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="tel" id="mobile" required class="login__input" placeholder="" pattern="[0-9]{10}">
-            <label class="login__label">Mobile Number / मोबाइल नंबर</label>
-          </div>
-        </div>
-      </div>
+            if (res.ok) {
+              // ✅ Auto login: store user in localStorage
+              localStorage.setItem("user", JSON.stringify(data.user));
 
-      <button type="submit" class="login__button">Sign Up / साइन अप करें</button>
-
-      <p class="login__register">
-        Already have an account?(क्या आपके पास पहले से खाता है?) <br><a href="login.html">Login (लॉगिन करें)</a>
-      </p>
-    </form>
-  </div>
-
-  <!-- Submit Form to Backend -->
-  <script>
-    document.getElementById("signup-form").addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const firstName = document.getElementById("first-name").value;
-      const lastName = document.getElementById("last-name").value;
-      const email = document.getElementById("email").value || null;
-      const dobInput = document.getElementById("dob").value;
-
-// convert 25-07-1999 → 1999-07-25
-const [day, month, year] = dobInput.split("-");
-const dob = `${year}-${month}-${day}`;
-      const gender = document.getElementById("gender").value;
-      const city = document.getElementById("city").value;
-      const state = document.getElementById("state").value;
-      const disease = document.getElementById("disease").value;
-      const mobile = document.getElementById("mobile").value;
-
-      // use DOB as password
-      const password = dob;  
-
-      try {
-        const res = await fetch("https://jainsewa-backend.onrender.com/api/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ firstName, lastName, email, dob, gender, city, state, disease, mobile, password })
-        });
-
-       const data = await res.json();
-
-        if (res.ok) {
-          
-
-          // ✅ Auto login: store user in localStorage
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          // ✅ Redirect based on role
-          if (data.user && data.user.role === "admin") {
-            window.location.href = "admin.html";
-          } else {
-            window.location.href = "p-dashboard.html?autoPay=1";
-
+              // ✅ Redirect based on role
+              if (data.user && data.user.role === "admin") {
+                window.location.href = "admin.html";
+              } else {
+                window.location.href = "p-dashboard.html?autoPay=1";
+              }
+            } else {
+              alert(data.message || "Signup failed");
+            }
+          } catch (error) {
+            console.error("Signup failed:", error);
+            alert("Something went wrong. Please try again.");
           }
-        } else {
-          alert(data.message || "Signup failed");
-        }
-
-      } catch (error) {
-        console.error("Signup failed:", error);
-        alert("Something went wrong. Please try again.");
-      }
-    });
-  </script>
-  <script>
-  flatpickr("#dob", {
-    dateFormat: "d-m-Y",
-    maxDate: "today",
-    yearSelectorType: "dropdown",
-    disableMobile: true, // 🔥 IMPORTANT for Android
-    defaultHour: 12
-  });
-</script>
-
-</body>
+        });
+    </script>
+    <script>
+      flatpickr("#dob", {
+        dateFormat: "d-m-Y",
+        maxDate: "today",
+        yearSelectorType: "dropdown",
+        disableMobile: true, // 🔥 IMPORTANT for Android
+        defaultHour: 12,
+      });
+    </script>
+  </body>
 </html>

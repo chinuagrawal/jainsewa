@@ -24,7 +24,8 @@ patient: {
   gender: String,
   city: String,
   state: String,
-  disease: String
+  disease: String,
+  registrationCenter: String
 },
 
 familyMemberId: {

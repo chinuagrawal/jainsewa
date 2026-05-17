@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
     city: { type: String },
     state: { type: String },
     disease: { type: String },
+    registrationCenter: { type: String },
 
     // ✅ Family members with FULL details
     familyMembers: [familyMemberSchema],

@@ -22,7 +22,8 @@ const PendingAppointmentSchema = new mongoose.Schema({
     gender: String,
     city: String,
     state: String,
-    disease: String
+    disease: String,
+    registrationCenter: String
   },
 
   doctor: String,

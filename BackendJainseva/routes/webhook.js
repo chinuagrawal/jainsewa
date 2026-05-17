@@ -47,7 +47,8 @@ router.post("/phonepe/webhook", async (req, res) => {
         gender: patient.gender || null,
         city: patient.city || null,
         state: patient.state || null,
-        disease: patient.disease || null
+        disease: patient.disease || null,
+        registrationCenter: patient.registrationCenter || null
       },
 
       doctor: pending.doctor || "General",

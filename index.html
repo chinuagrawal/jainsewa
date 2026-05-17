@@ -485,6 +485,11 @@ http://www.tooplate.com/view/2098-health
             </div>
 
             <div class="col-md-12 col-sm-12">
+              <label for="registration-center">Registration Center / पंजीकरण केंद्र (optional)</label>
+              <input type="text" class="form-control" id="registration-center">
+            </div>
+
+            <div class="col-md-12 col-sm-12">
               <label for="mobile">Mobile Number / मोबाइल नंबर</label>
               <input type="tel" class="form-control" id="mobile" required pattern="[0-9]{10}">
             </div>
@@ -543,6 +548,7 @@ const dob = `${year}-${month}-${day}`;
   const city = document.getElementById("city").value;
   const state = document.getElementById("state").value;
   const disease = document.getElementById("disease").value;
+  const registrationCenter = document.getElementById("registration-center").value || null;
   const mobile = document.getElementById("mobile").value;
 
   const password = dob; // same trick as signup
@@ -551,7 +557,7 @@ const dob = `${year}-${month}-${day}`;
     const res = await fetch("https://jainsewa-backend.onrender.com/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ firstName, lastName, email, dob, gender, city, state, disease, mobile, password })
+      body: JSON.stringify({ firstName, lastName, email, dob, gender, city, state, disease, registrationCenter, mobile, password })
     });
 
     const data = await res.json();
