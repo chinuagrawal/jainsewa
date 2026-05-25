@@ -251,17 +251,23 @@
           const isFamily = appt.patientType === "family";
 
           const calculateAge = (dobString) => {
-            if (!dobString) return null;
-            const birthDate = new Date(dobString);
-            if (isNaN(birthDate)) return null;
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-            }
-            return age;
-          };
+      if (!dobString) return null;
+      // Convert DD-MM-YYYY or similar to YYYY-MM-DD if needed
+      let dateParts = dobString.split("-");
+      let isoDob = dobString;
+      if (dateParts.length === 3 && dateParts[0].length === 2) {
+        isoDob = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+      }
+      const birthDate = new Date(isoDob);
+      if (isNaN(birthDate)) return null;
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    };
 
           let displayAge = p.age || calculateAge(p.dob);
 
