@@ -247,12 +247,16 @@ app.put("/api/admin/appointments/:id/viewed", async (req, res) => {
 // Utility function: get PhonePe Access Token
 const getPhonePeAccessToken = async () => {
   try {
-    const baseUrl = (process.env.PHONEPE_BASE_URL || 'https://api.phonepe.com').replace(/\/$/, '');
+    const baseUrl = (
+      process.env.PHONEPE_BASE_URL || "https://api.phonepe.com"
+    ).replace(/\/$/, "");
     const clientId = process.env.PHONEPE_CLIENT_ID;
     const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-      throw new Error("PhonePe Client ID or Secret is missing in environment variables");
+      throw new Error(
+        "PhonePe Client ID or Secret is missing in environment variables",
+      );
     }
 
     const response = await axios.post(
@@ -260,24 +264,29 @@ const getPhonePeAccessToken = async () => {
       new URLSearchParams({
         client_id: clientId,
         client_secret: clientSecret,
-        grant_type: 'client_credentials',
-        client_version: '1'
+        grant_type: "client_credentials",
+        client_version: "1",
       }).toString(),
       {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      }
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      },
     );
 
     return response.data.access_token;
   } catch (error) {
-    console.error("❌ PhonePe Token Error:", error.response?.data || error.message);
+    console.error(
+      "❌ PhonePe Token Error:",
+      error.response?.data || error.message,
+    );
     throw error;
   }
 };
 
-
-app.post('/api/payment/initiate', async (req, res) => {
-  console.log("🔥 Payment Initiation Request:", JSON.stringify(req.body, null, 2));
+app.post("/api/payment/initiate", async (req, res) => {
+  console.log(
+    "🔥 Payment Initiation Request:",
+    JSON.stringify(req.body, null, 2),
+  );
 
   try {
     const { amount, email, mobile, purpose, notes, patient } = req.body;
@@ -293,9 +302,11 @@ app.post('/api/payment/initiate', async (req, res) => {
       return res.status(400).json({ message: "Valid amount is required" });
     }
 
-    const merchantTransactionId = 'TXN_' + Date.now();
+    const merchantTransactionId = "TXN_" + Date.now();
     const merchantId = process.env.PHONEPE_MERCHANT_ID;
-    const baseUrl = (process.env.PHONEPE_BASE_URL || 'https://api.phonepe.com').replace(/\/$/, '');
+    const baseUrl = (
+      process.env.PHONEPE_BASE_URL || "https://api.phonepe.com"
+    ).replace(/\/$/, "");
     const redirectUrl = `${process.env.PHONEPE_REDIRECT_URL}?txnId=${merchantTransactionId}`;
 
     if (!merchantId) {
@@ -303,31 +314,46 @@ app.post('/api/payment/initiate', async (req, res) => {
     }
 
     // ✅ STORE PENDING APPOINTMENT
-    await PendingAppointment.create({
-      txnId: merchantTransactionId,
-      email,
-      mobile,
-      amount,
-      purpose,
-      notes,
-      patient: {
-        type: patient.type,
-        name: patient.name,
-        relation: patient.relation || null,
-        age: patient.age || null,
-        dob: patient.dob || null,
-        gender: patient.gender || null,
-        city: patient.city || null,
-        state: patient.state || null,
-        disease: patient.disease || null,
-        registrationCenter: patient.registrationCenter || null
-      }
-    });
+    try {
+      await PendingAppointment.create({
+        txnId: merchantTransactionId,
+        email,
+        mobile,
+        amount,
+        purpose,
+        notes,
+        patient: {
+          type: patient.type,
+          name: patient.name,
+          relation: patient.relation || null,
+          age: patient.age || null,
+          dob: patient.dob || null,
+          gender: patient.gender || null,
+          city: patient.city || null,
+          state: patient.state || null,
+          disease: patient.disease || null,
+          registrationCenter: patient.registrationCenter || null,
+        },
+      });
+      console.log(`✅ Pending Appointment stored: ${merchantTransactionId}`);
+    } catch (dbErr) {
+      console.error("❌ Database Error (PendingAppointment):", dbErr.message);
+      return res.status(500).json({
+        message: "Failed to store pending appointment",
+        details: dbErr.message,
+      });
+    }
 
-    console.log(`✅ Pending Appointment stored: ${merchantTransactionId}`);
-
-    const accessToken = await getPhonePeAccessToken();
-    console.log("✅ PhonePe Access Token retrieved");
+    let accessToken;
+    try {
+      accessToken = await getPhonePeAccessToken();
+      console.log("✅ PhonePe Access Token retrieved");
+    } catch (tokenErr) {
+      return res.status(500).json({
+        message: "Failed to retrieve PhonePe token",
+        details: tokenErr.response?.data || tokenErr.message,
+      });
+    }
 
     // ✅ PHONEPE PAYLOAD
     const payload = {
@@ -339,34 +365,44 @@ app.post('/api/payment/initiate', async (req, res) => {
       paymentFlow: {
         type: "PG_CHECKOUT",
         redirectMode: "AUTO",
-        merchantUrls: { redirectUrl }
-      }
+        merchantUrls: { redirectUrl },
+      },
     };
 
-    const response = await axios.post(
-      `${baseUrl}/apis/pg/checkout/v2/pay`,
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `O-Bearer ${accessToken}`
-        }
-      }
-    );
+    try {
+      const response = await axios.post(
+        `${baseUrl}/apis/pg/checkout/v2/pay`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `O-Bearer ${accessToken}`,
+          },
+        },
+      );
 
-    console.log("✅ PhonePe Pay API Success");
+      console.log("✅ PhonePe Pay API Success");
 
-    res.json({
-      redirectUrl: response.data.redirectUrl || redirectUrl,
-      merchantTransactionId
-    });
-
+      res.json({
+        redirectUrl: response.data.redirectUrl || redirectUrl,
+        merchantTransactionId,
+      });
+    } catch (payErr) {
+      console.error(
+        "❌ PhonePe Pay API Error:",
+        payErr.response?.data || payErr.message,
+      );
+      return res.status(500).json({
+        message: "PhonePe Pay API call failed",
+        details: payErr.response?.data || payErr.message,
+      });
+    }
   } catch (err) {
     const errorDetails = err.response?.data || err.message;
     console.error("❌ Payment Initiation Error:", errorDetails);
     res.status(500).json({
       message: "Payment initiation failed",
-      details: errorDetails
+      details: errorDetails,
     });
   }
 });

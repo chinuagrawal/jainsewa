@@ -1173,23 +1173,23 @@
         let patient;
 
         const calculateAge = (dobString) => {
-      if (!dobString) return null;
-      // Convert DD-MM-YYYY or similar to YYYY-MM-DD if needed
-      let dateParts = dobString.split("-");
-      let isoDob = dobString;
-      if (dateParts.length === 3 && dateParts[0].length === 2) {
-        isoDob = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-      }
-      const birthDate = new Date(isoDob);
-      if (isNaN(birthDate)) return null;
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age;
-    };
+          if (!dobString) return null;
+          // Convert DD-MM-YYYY or similar to YYYY-MM-DD if needed
+          let dateParts = dobString.split("-");
+          let isoDob = dobString;
+          if (dateParts.length === 3 && dateParts[0].length === 2) {
+            isoDob = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+          }
+          const birthDate = new Date(isoDob);
+          if (isNaN(birthDate)) return null;
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          return age;
+        };
 
         if (appointmentFor.value === "self") {
           patient = {
@@ -1246,7 +1246,11 @@
 
           const data = await res.json();
           if (!res.ok) {
-            throw new Error(data.details || data.message || "Payment failed");
+            const errorMsg =
+              typeof data.details === "object"
+                ? JSON.stringify(data.details, null, 2)
+                : data.details || data.message || "Payment failed";
+            throw new Error(errorMsg);
           }
           sessionStorage.setItem(
             "paymentSuccessData",
